@@ -19,6 +19,7 @@ int line_analyzer(char *line, int* ants, t_list **farm)
 	int		edge;
 	t_list	*room;
 	char 	**room_and_coord;
+	char 	**edges;
 
 	vertex = ft_countrows(line, ' ');
 	edge = ft_countrows(line, '-');
@@ -26,12 +27,16 @@ int line_analyzer(char *line, int* ants, t_list **farm)
 	{
 		room_and_coord = ft_strsplit(line, ' ');
 		room = ft_lstnew(room_and_coord[0], ft_strlen(room_and_coord[0]) + 1);
-		(*farm)->content = ft_lstnew(&room, 8);
+		(*farm)->content = ft_lstnew(room, 48);
 		return (1);
 	}
 	if (edge == 2)
 	{
-
+		edges = ft_strsplit(line, '-');
+		while (*farm)
+		{
+			if (ft_strcmp((*farm)->content, edges[0]);
+		}
 	}
 	return (0);
 }

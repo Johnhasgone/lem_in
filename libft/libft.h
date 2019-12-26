@@ -20,7 +20,7 @@
 
 typedef struct		s_list
 {
-	int				*content;
+	void			*content;
 	size_t			content_size;
 	int				iter;
 	struct s_list	*next;
