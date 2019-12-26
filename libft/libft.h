@@ -93,7 +93,6 @@ char				**ft_delmap(char **str, int i);
 
 size_t				ft_strlen_p(const char *s);
 void				ft_lstadd_end(t_list **alst, t_list *new);
-int					ft_lst_check_add_end(t_list **alst, t_list *new);
 int					ft_count_if(char **tab, int (*f)(char*));
 t_list				*ft_free_lst(t_list *lst);
 t_list				*ft_lstpop(t_list **begin_list);
