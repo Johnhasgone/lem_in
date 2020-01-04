@@ -17,7 +17,7 @@ int line_analyzer(char *line, int* ants, t_list **farm)
 {
 	int 	vertex;
 	int		edge;
-	t_list	*room;
+	t_room	*room;
 	char 	**room_and_coord;
 	char 	**edges;
 
@@ -25,20 +25,15 @@ int line_analyzer(char *line, int* ants, t_list **farm)
 	edge = ft_countrows(line, '-');
 	if (vertex == 3)
 	{
+		room = (t_room*)malloc(20); // как определить размер памяти для
+		// аллокации
 		room_and_coord = ft_strsplit(line, ' ');
-		room = ft_lstnew(room_and_coord[0], ft_strlen(room_and_coord[0]) + 1);
+		room->name = room_and_coord[0];
 		(*farm)->content = ft_lstnew(room, 48);
 		return (1);
 	}
-	if (edge == 2)
-	{
-		edges = ft_strsplit(line, '-');
-		while (*farm)
-		{
-			if (ft_strcmp((*farm)->content, edges[0]);
-		}
-	}
-	return (0);
+	else
+		return (0);
 }
 
 int main()

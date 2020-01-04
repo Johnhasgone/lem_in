@@ -15,4 +15,11 @@
 
 #include "libft.h"
 
+typedef struct		s_room
+{
+	char			*name;
+	int				*edges;
+	int 			way;
+}					t_room;
+
 #endif
