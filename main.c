@@ -98,30 +98,36 @@ int line_analyzer_edge(char *line, t_room **farm, int count)
 	return (0);
 }
 
-int			line_analyzer(char *line, int *ants, t_room **farm, int *i)
+int			line_analyzer(char **line, int *ants, t_room **farm, int *i)
 {
-	if (ft_countrows(line, ' ') == 3)
+	if (ft_countrows(*line, ' ') == 3)
 	{
-		if (!line_analyzer_room(line, farm, i, 0))
+		if (!line_analyzer_room(*line, farm, i, 0))
 			return (0);
 	}
-	else if (ft_countrows(line, '-') == 2)
+	else if (ft_countrows(*line, '-') == 2)
 	{
-		if (!line_analyzer_edge(line, farm, *i))
+		if (!line_analyzer_edge(*line, farm, *i))
 			return (0);
 	}
-	else if (ft_strcmp(line, "##start") == 0)
+	else if (ft_strcmp(*line, "##start") == 0)
 	{
-		get_next_line(0, &line);
-		if (!line_analyzer_room(line, farm, i, 1))
+		get_next_line(0, line);
+		if (!line_analyzer_room(*line, farm, i, 1))
 			return (0);
 	}
-	else if (ft_strcmp(line, "##end") == 0)
+	else if (ft_strcmp(*line, "##end") == 0)
 	{
-		get_next_line(0, &line);
-		if (!line_analyzer_room(line, farm, i, 2))
+		get_next_line(0, line);
+		if (!line_analyzer_room(*line, farm, i, 2))
 			return (0);
 	}
+	else if (int_check(*line) == 1)
+		*ants = ft_atoi(*line);
+	else if (*line[0] == '#')
+		return (1);
+	else
+		return (0);
 	return (1);
 }
 
