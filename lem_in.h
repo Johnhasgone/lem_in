@@ -18,8 +18,14 @@
 typedef struct		s_room
 {
 	char			*name;
+	int 			coordinates[2];
 	int				*edges;
+	int				deg;
+	int 			type;	// 0 - ordinary, 1 - start, 2 - finish
 	int 			way;
 }					t_room;
+
+int line_analyzer_room(char *line, t_room **farm, int *i, int type);
+int		line_analyzer_edge(char *line, t_room **farm, int count);
 
 #endif
