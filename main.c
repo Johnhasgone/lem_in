@@ -12,30 +12,6 @@
 
 #include "lem_in.h"
 
-void    parse_argument(char *str, t_list **stack_a, t_list **stack_b)
-{
-	long long   arg;
-	int         neg;
-	ignore_whitespace(&str);
-	while (*str)
-	{
-		neg = check_sign(&str);
-		if (neg == 2)
-			free_error_exit(stack_a, stack_b, "Not an integer!");
-		arg = 0;
-		while (*str >= '0' && *str <= '9')
-		{
-			arg = arg * 10 + (long long)(*(str++) - '0');
-			if (arg >= 2147483648 + (neg == -1))
-				free_error_exit(stack_a, stack_b, "Doesn't fit in INT!");
-		}
-		if (*str && !(ft_isspace(*str)))
-			free_error_exit(stack_a, stack_b, "Not an integer!");
-		check_duplicates_add(stack_a, stack_b, arg * neg);
-		ignore_whitespace(&str);
-	}
-}
-
 int			int_check(char *str)
 {
 	int		i;
@@ -88,13 +64,10 @@ int line_analyzer_edge(char *line, t_room **farm, int count)
 	}
 	if (i != count && j != count)
 	{
-		farm[i]->edges[farm[i]->deg] = j;
-		farm[i]->deg++;
-		farm[j]->edges[farm[j]->deg] = i;
-		farm[j]->deg++;
+		(farm[i]->edges)[(farm[i]->deg)++] = j;
+		(farm[j]->edges)[(farm[j]->deg)++] = i;
 		return (1);
 	}
-
 	return (0);
 }
 
@@ -131,7 +104,6 @@ int			line_analyzer(char **line, int *ants, t_room **farm, int *i)
 	return (1);
 }
 
-
 int line_analyzer_room(char *line, t_room **farm, int *i, int type)
 {
 	t_room	*room;
@@ -146,31 +118,25 @@ int line_analyzer_room(char *line, t_room **farm, int *i, int type)
 		room->coordinates[1] = ft_atoi(room_and_coord[2]);
 		room->deg = 0;
 		room->type = type;
-		farm[*i++] = room;
+		farm[(*i)++] = room;
 		return (1);
 	}
 	else
 		return (0);
 }
 
-
-
 int main()
 {
 	char 		*line;
-	t_room		*farm[1000];
+	t_room		*farm[10000];
 	int			ants;
 	int 		i;
-	
 
 	ants = -1;
-	i = 0
-
+	i = 0;
 	while (get_next_line(0, &line))
 	{
-		if (line_analyzer(line, &ants, farm, &i))
-			farm_maker(line, &farm);
-		else
-			error_report
+		if (!line_analyzer(&line, &ants, farm, &i))
+			write(2, "Incorrect farm instructions\n", 28);
 	}
 }
