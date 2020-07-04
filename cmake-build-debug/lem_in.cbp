@@ -302,6 +302,9 @@
 		<Unit filename="/Users/cimogene/42/lem_in/lem_in/main.c">
 			<Option target="lem_in"/>
 		</Unit>
+		<Unit filename="/Users/cimogene/42/lem_in/lem_in/queue.c">
+			<Option target="lem_in"/>
+		</Unit>
 		<Unit filename="/Users/cimogene/42/lem_in/lem_in/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

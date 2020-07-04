@@ -13,7 +13,10 @@
 #ifndef LEM_IN_H
 #define LEM_IN_H
 
-#include "libft/libft.h"
+# include "libft/libft.h"
+# include <string.h>
+# include <unistd.h>
+# include <stdlib.h>
 
 /* Edge of an ant farm
  * weight: 1, 0, -1 										  //something about the direction of yhe edge
@@ -37,6 +40,14 @@ typedef struct		s_room
 	int 			type;	// 0 - ordinary, 1 - start, 2 - finish
 	int 			way;    // 1 - included in a way for ants, 0 - not included
 }					t_room;
+
+// queue for breadth search
+typedef struct				s_queue
+{
+	t_room 					**room;
+	struct s_queue			*next;
+}							t_queue;
+
 
 
 int		analyze_room_line(char *line, t_room **farm, int *room_counter, int type);

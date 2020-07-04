@@ -2067,6 +2067,33 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/main.c.s
 .PHONY : main.c.s
 
+queue.o: queue.c.o
+
+.PHONY : queue.o
+
+# target to build an object file
+queue.c.o:
+	$(MAKE) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/queue.c.o
+.PHONY : queue.c.o
+
+queue.i: queue.c.i
+
+.PHONY : queue.i
+
+# target to preprocess a source file
+queue.c.i:
+	$(MAKE) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/queue.c.i
+.PHONY : queue.c.i
+
+queue.s: queue.c.s
+
+.PHONY : queue.s
+
+# target to generate assembly for a file
+queue.c.s:
+	$(MAKE) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/queue.c.s
+.PHONY : queue.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -2292,6 +2319,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... queue.o"
+	@echo "... queue.i"
+	@echo "... queue.s"
 .PHONY : help
 
 

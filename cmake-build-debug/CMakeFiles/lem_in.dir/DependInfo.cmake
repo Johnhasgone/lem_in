@@ -76,6 +76,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_toupper.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_toupper.c.o"
   "/Users/cimogene/42/lem_in/lem_in/libft/get_next_line.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/get_next_line.c.o"
   "/Users/cimogene/42/lem_in/lem_in/main.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/main.c.o"
+  "/Users/cimogene/42/lem_in/lem_in/queue.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/queue.c.o"
   )
 set(CMAKE_C_COMPILER_ID "AppleClang")
 

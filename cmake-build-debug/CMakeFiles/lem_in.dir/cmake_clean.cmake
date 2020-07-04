@@ -71,6 +71,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/lem_in.dir/libft/ft_toupper.c.o"
   "CMakeFiles/lem_in.dir/libft/get_next_line.c.o"
   "CMakeFiles/lem_in.dir/main.c.o"
+  "CMakeFiles/lem_in.dir/queue.c.o"
   "lem_in"
   "lem_in.pdb"
 )
