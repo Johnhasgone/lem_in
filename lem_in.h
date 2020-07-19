@@ -44,7 +44,8 @@ typedef struct		s_room
 // queue for breadth search
 typedef struct				s_queue
 {
-	t_room 					**room;
+	t_room 					*room;
+	size_t 					content_size;
 	struct s_queue			*next;
 }							t_queue;
 
@@ -54,6 +55,7 @@ int		analyze_room_line(char *line, t_room **farm, int *room_counter, int type);
 int		analyze_edge_line(char *line, t_room **farm, int room_counter);
 void		set_weight(t_edge **edge, int weight);
 t_edge		*create_edge(int from, int to);
-
+void 		put_room(t_queue **room_queue, t_room *room);
+t_queue 	*create_queue_element(t_room *room);
 
 #endif

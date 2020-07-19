@@ -168,6 +168,7 @@ int main()
 	t_room		*farm[10000];
 	int			ants;
 	int 		room_counter;
+	t_queue 	*room_queue;
 
 	ants = -1;
 	room_counter = 0;
@@ -176,5 +177,12 @@ int main()
             write(2, "Incorrect farm instructions\n", 28);
             exit(1);
         }
+	}
+	for (int i = 0; i < 10000; i++)
+	{
+		if (farm[i])
+		{
+			put_room(&room_queue, farm[i]);
+		}
 	}
 }

@@ -27,27 +27,29 @@ int		queue_size(t_queue	*room_queue)
 	return (size);
 }
 
-t_room	**get_room(t_queue **room_queue)
+t_queue *create_queue_element(t_room *room)
 {
-	int			size;
-	t_room 		**return_room;
+	t_queue *new_queue_elem;
 
-	size = queue_size(*room_queue);
-	if (size == 0)
-		return (NULL);
-	if (size == 1)
+	new_queue_elem = (t_queue*)malloc(sizeof(t_queue));
+	if (new_queue_elem != NULL)
 	{
-		return_room = (*room_queue)->room;
-		free(room_queue);
-		room_queue = NULL;
-		return (return_room);
+		new_queue_elem->room = room;
+		new_queue_elem->content_size = sizeof(*room);
+		new_queue_elem->next = NULL;
 	}
-	while ((*room_queue)->next->next)
-	{
-		room_queue = &(*room_queue)->next;
-	}
-	return_room = (*room_queue)->next->room;
-	free((*room_queue)->next);
-	(*room_queue)->next = NULL;
-	return (return_room);
+	return new_queue_elem;
+}
+
+void put_room(t_queue **room_queue, t_room *room)
+{
+	t_queue *new_room_node;
+
+	new_room_node = create_queue_element(room);
+	ft_lstadd((t_list**) room_queue, (t_list*) new_room_node);
+}
+
+t_room	*pop_room(t_queue **room_queue)
+{
+	return (t_room *) ft_lstpop_end((t_list **) room_queue);
 }
