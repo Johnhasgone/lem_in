@@ -72,8 +72,8 @@ int analyze_edge_line(char *line, t_room **farm, int room_counter)
 		set_weight(&edge_from, 1);
 		edge_to = create_edge(j, i);
 		set_weight(&edge_to, 1);
-		(farm[i]->edges)[(farm[i]->deg)++] = edge_from;
-		(farm[j]->edges)[(farm[j]->deg)++] = edge_to;
+		ft_lstadd_end(&farm[i]->edges, ft_lstnew(edge_from, sizeof(*edge_from)));
+		ft_lstadd_end(&farm[j]->edges, ft_lstnew(edge_to, sizeof(*edge_to)));
 		return (1);
 	}
 	return (0);
@@ -172,7 +172,10 @@ int main()
 
 	ants = -1;
 	room_counter = 0;
-	while (get_next_line(0, &line)) {
+	while (get_next_line(0, &line))
+	{
+		if (ft_strcmp(line, "end_input") == 0)
+			break;
         if (!analyze_line(&line, &ants, farm, &room_counter)) {
             write(2, "Incorrect farm instructions\n", 28);
             exit(1);

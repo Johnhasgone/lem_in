@@ -35,7 +35,7 @@ typedef struct		s_room
 {
 	char			*name;
 	int 			coordinates[2];
-	t_edge			*edges[10000];
+	t_list			*edges;
 	int				deg;
 	int 			type;	// 0 - ordinary, 1 - start, 2 - finish
 	int 			way;    // 1 - included in a way for ants, 0 - not included
