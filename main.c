@@ -72,8 +72,8 @@ int analyze_edge_line(char *line, t_room **farm, int room_counter)
 		set_weight(&edge_from, 1);
 		edge_to = create_edge(j, i);
 		set_weight(&edge_to, 1);
-		ft_lstadd_end(&farm[i]->edges, ft_lstnew(edge_from, sizeof(*edge_from)));
-		ft_lstadd_end(&farm[j]->edges, ft_lstnew(edge_to, sizeof(*edge_to)));
+		ft_lstadd_end(&(farm[i]->edges), ft_lstnew(edge_from, sizeof(*edge_from)));
+		ft_lstadd_end(&(farm[j]->edges), ft_lstnew(edge_to, sizeof(*edge_to)));
 		return (1);
 	}
 	return (0);
@@ -139,6 +139,7 @@ int analyze_room_line(char *line, t_room **farm, int *room_counter, int type)
 		room->coordinates[1] = ft_atoi(room_and_coord[2]);
 		room->deg = 0;
 		room->type = type;
+		room->edges = NULL;
 		farm[(*room_counter)++] = room;
 		return (1);
 	}
