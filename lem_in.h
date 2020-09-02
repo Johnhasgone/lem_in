@@ -57,5 +57,7 @@ void		set_weight(t_edge **edge, int weight);
 t_edge		*create_edge(int from, int to);
 void 		put_room(t_queue **room_queue, t_room *room);
 t_queue 	*create_queue_element(t_room *room);
+void 		write_ant_moving(t_edge **shortest_path_list);
+t_edge 		**find_shortest_paths(t_room **farm);
 
 #endif

@@ -12,6 +12,11 @@
 
 #include "lem_in.h"
 
+int get_max_path_count(t_room *farm);
+
+int ft_lst_length(t_list *list);
+
+t_room *ft_lst_copy(t_room *farm);
 
 int			check_integer(char *str)
 {
@@ -163,13 +168,11 @@ void duplicate_rooms(t_room **farm)
 
 }
 
-int main()
+void read_instructions(t_room **farm)
 {
 	char 		*line;
-	t_room		*farm[10000];
 	int			ants;
 	int 		room_counter;
-	t_queue 	*room_queue;
 
 	ants = -1;
 	room_counter = 0;
@@ -177,11 +180,25 @@ int main()
 	{
 		if (ft_strcmp(line, "end_input") == 0)
 			break;
-        if (!analyze_line(&line, &ants, farm, &room_counter)) {
-            write(2, "Incorrect farm instructions\n", 28);
-            exit(1);
-        }
+		if (!analyze_line(&line, &ants, farm, &room_counter)) {
+			write(2, "Incorrect farm instructions\n", 28);
+			exit(1);
+		}
 	}
+}
+
+int main()
+{
+	t_room		*farm[10000];
+	t_queue 	*room_queue;
+	t_edge		**shortest_path_list;
+
+	read_instructions(farm);
+
+	shortest_path_list = find_shortest_paths(farm);
+
+	write_ant_moving(shortest_path_list);
+
 	for (int i = 0; i < 10000; i++)
 	{
 		if (farm[i])
@@ -189,4 +206,75 @@ int main()
 			put_room(&room_queue, farm[i]);
 		}
 	}
+
+
 }
+
+t_edge **find_shortest_paths(t_room **farm)
+{
+	t_room	*current_farm;
+	t_edge	**overlap_path_list;
+	t_edge	**shortest_path_list;
+	int		max_path_count;
+	int		i;
+	int     n;
+	int 	array[n];
+
+	max_path_count = get_max_path_count(*farm);
+	i = 0;
+	while (i < max_path_count)
+	{
+		current_farm = ft_lst_copy(*farm);
+		if (i != 0)
+		{
+			duplicate_rooms(farm)
+		}
+		i++;
+	}
+
+	return shortest_path_list;
+}
+
+t_room *ft_lst_copy(t_room *farm) {
+	return NULL;
+}
+
+int get_max_path_count(t_room *farm) {
+	int	max_path_count;
+	int path_count;
+
+	max_path_count = INT32_MAX;
+	while (farm)
+	{
+		if (farm->type != 0)
+		{
+			path_count = ft_lst_length(farm->edges);
+			if (max_path_count == INT32_MAX)
+				max_path_count = path_count;
+			else
+			{
+				if (path_count < max_path_count)
+					return path_count;
+				return max_path_count;
+			}
+		}
+	}
+}
+
+int ft_lst_length(t_list *list) {
+	int length;
+
+	length = 0;
+	while (list)
+	{
+		length++;
+		list = list->next;
+	}
+	return length;
+}
+
+void write_ant_moving(t_edge **shortest_path_list) {
+
+}
+
+
