@@ -16,7 +16,9 @@ int get_max_path_count(t_room *farm);
 
 int ft_lst_length(t_list *list);
 
-t_room *ft_lst_copy(t_room *farm);
+void ft_farm_copy(t_room **farm, t_room **current_farm);
+
+void initialize_current_farm(t_room **current_farm);
 
 int			check_integer(char *str)
 {
@@ -160,15 +162,25 @@ t_room *clone_room(t_room *room)
 	clone_room->coordinates[0] = room->coordinates[0];
 	clone_room->coordinates[1] = room->coordinates[1];
 	clone_room->deg = room->deg;
-	clone_room->type = room->type;
+	clone_room->type = 3;
 }
 
-void duplicate_rooms(t_room **farm)
-{
+void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_counter) {
+	int room_number;
 
+	while (shortest_path)
+	{
+		room_number = ((t_edge *) shortest_path->content)->from;
+		if (current_farm[room_number]->type == SIMPLE)
+		{
+			current_farm[*room_counter++] = clone_room(current_farm[room_number]);
+
+		}
+		shortest_path = shortest_path->next;
+	}
 }
 
-void read_instructions(t_room **farm)
+int read_instructions(t_room **farm)
 {
 	char 		*line;
 	int			ants;
@@ -185,17 +197,19 @@ void read_instructions(t_room **farm)
 			exit(1);
 		}
 	}
+	return room_counter;
 }
 
 int main()
 {
-	t_room		*farm[10000];
+	t_room		*farm[ROOM_NUM];
 	t_queue 	*room_queue;
-	t_edge		**shortest_path_list;
+	t_list		*shortest_path_list;
+	int			room_counter;
 
-	read_instructions(farm);
+	room_counter = read_instructions(farm);
 
-	shortest_path_list = find_shortest_paths(farm);
+	shortest_path_list = find_shortest_paths(farm, &room_counter);
 
 	write_ant_moving(shortest_path_list);
 
@@ -210,35 +224,64 @@ int main()
 
 }
 
-t_edge **find_shortest_paths(t_room **farm)
+t_list *find_shortest_paths(t_room **farm, int *room_counter)
 {
-	t_room	*current_farm;
+	t_room	*current_farm[ROOM_NUM];
 	t_edge	**overlap_path_list;
-	t_edge	**shortest_path_list;
+	t_list	*shortest_path_list;
 	int		max_path_count;
 	int		i;
-	int     n;
-	int 	array[n];
 
 	max_path_count = get_max_path_count(*farm);
+	initialize_current_farm(current_farm);
 	i = 0;
 	while (i < max_path_count)
 	{
-		current_farm = ft_lst_copy(*farm);
+		ft_farm_copy(farm, current_farm);
+
 		if (i != 0)
 		{
-			duplicate_rooms(farm)
+			duplicate_rooms(farm, shortest_path_list, room_counter);
 		}
 		i++;
 	}
-
+	free_current_farm(current_farm);
 	return shortest_path_list;
 }
 
-t_room *ft_lst_copy(t_room *farm) {
-	return NULL;
+void initialize_current_farm(t_room **current_farm) {
+	while (*current_farm)
+	{
+		*current_farm = (t_room*)malloc(sizeof(t_room));
+		current_farm++;
+	}
 }
 
+void free_current_farm(t_room **current_farm) {
+	while (*current_farm)
+	{
+		free(*current_farm);
+		current_farm++;
+	}
+}
+
+void ft_farm_copy(t_room **farm, t_room **current_farm) {
+	while (*farm)
+	{
+		(*current_farm)->name = (*farm)->name;
+		(*current_farm)->coordinates[0] = (*farm)->coordinates[0];
+		(*current_farm)->coordinates[1] = (*farm)->coordinates[1];
+		(*current_farm)->deg = (*farm)->deg;
+		(*current_farm)->type = (*farm)->type;
+		(*current_farm)->edges = (*farm)->edges;
+		(*current_farm)->way = (*farm)->way;
+		current_farm++;
+		farm++;
+	}
+}
+
+
+// max count of ways or max iteration number (min of edges from start and edges to end)
 int get_max_path_count(t_room *farm) {
 	int	max_path_count;
 	int path_count;
@@ -273,7 +316,7 @@ int ft_lst_length(t_list *list) {
 	return length;
 }
 
-void write_ant_moving(t_edge **shortest_path_list) {
+void write_ant_moving(t_list *shortest_path_list) {
 
 }
 
