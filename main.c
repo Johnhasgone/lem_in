@@ -20,6 +20,9 @@ void ft_farm_copy(t_room **farm, t_room **current_farm);
 
 void initialize_current_farm(t_room **current_farm);
 
+
+void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path);
+
 int			check_integer(char *str)
 {
 	int		i;
@@ -162,22 +165,47 @@ t_room *clone_room(t_room *room)
 	clone_room->coordinates[0] = room->coordinates[0];
 	clone_room->coordinates[1] = room->coordinates[1];
 	clone_room->deg = room->deg;
-	clone_room->type = 3;
+	clone_room->type = DUPLICATE;
+	clone_room->edges = ft_lst_deep_copy(room->edges, edge_copy);
+	return clone_room;
+}
+
+t_edge	*edge_copy(t_edge *edge)
+{
+	t_edge *edge_copy;
+
+	edge_copy = malloc(sizeof(t_edge));
+	edge_copy->from = edge->from;
+	edge_copy->to = edge->to;
+	edge_copy->weight = edge->weight;
+	return edge_copy;
 }
 
 void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_counter) {
 	int room_number;
-
+	t_edge *new_edge;
 	while (shortest_path)
 	{
 		room_number = ((t_edge *) shortest_path->content)->from;
 		if (current_farm[room_number]->type == SIMPLE)
 		{
-			current_farm[*room_counter++] = clone_room(current_farm[room_number]);
-
+			current_farm[*room_counter] = clone_room(current_farm[room_number]);
+			add_new_edge(current_farm, *room_counter, room_number, 0);
+			(*room_counter)++;
 		}
 		shortest_path = shortest_path->next;
+
 	}
+}
+
+void add_new_edge(t_room **farm, int from, int to, int weight)
+{
+	t_edge *new_edge;
+	new_edge = (t_edge*)malloc(sizeof(t_edge));
+	new_edge->from = from;
+	new_edge->to = to;
+	new_edge->weight = weight;
+	ft_lstadd(&farm[from]->edges, (t_list*) new_edge);
 }
 
 int read_instructions(t_room **farm)
@@ -241,12 +269,28 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 
 		if (i != 0)
 		{
-			duplicate_rooms(farm, shortest_path_list, room_counter);
+			reverse_shortest_paths(current_farm, shortest_path_list);
+			duplicate_rooms(current_farm, shortest_path_list, room_counter);
 		}
 		i++;
 	}
 	free_current_farm(current_farm);
 	return shortest_path_list;
+}
+
+void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and destroy one of parallel edges
+{
+	int from;
+	int to;
+
+	while (shortest_path)
+	{
+		from = ((t_edge *) shortest_path->content)->from;
+		to = ((t_edge *) shortest_path->content)->to;
+		seek_and_minusize(current_farm[to]->edges, from, to); // find edge with direction from TO to FROM and set weight to -1
+		seek_and_destroy(current_farm[from]->edges, from, to); // find edge with direction from FROM to TO and DESTROY
+		shortest_path = shortest_path->next;
+	}
 }
 
 void initialize_current_farm(t_room **current_farm) {

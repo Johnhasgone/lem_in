@@ -32,13 +32,13 @@ typedef struct		s_edge
 	int				to;
 }					t_edge;
 
-typedef enum e_room_type
+typedef enum		e_type
 {
 	SIMPLE,
 	START,
 	END,
 	DUPLICATE
-};
+}					e_room_type;
 
 // Node of an ant farm
 typedef struct		s_room
@@ -61,14 +61,16 @@ typedef struct				s_queue
 
 
 
-int		analyze_room_line(char *line, t_room **farm, int *room_counter, int type);
-int		analyze_edge_line(char *line, t_room **farm, int room_counter);
-void		set_weight(t_edge **edge, int weight);
-t_edge		*create_edge(int from, int to);
-void 		put_room(t_queue **room_queue, t_room *room);
-t_queue 	*create_queue_element(t_room *room);
-void 		write_ant_moving(t_list *shortest_path_list);
-t_list *find_shortest_paths(t_room **farm, int *room_counter);
-void free_current_farm(t_room **current_farm);
+int							analyze_room_line(char *line, t_room **farm, int *room_counter, int type);
+int							analyze_edge_line(char *line, t_room **farm, int room_counter);
+void						set_weight(t_edge **edge, int weight);
+t_edge						*create_edge(int from, int to);
+void 						put_room(t_queue **room_queue, t_room *room);
+t_queue 					*create_queue_element(t_room *room);
+void 						write_ant_moving(t_list *shortest_path_list);
+t_list 						*find_shortest_paths(t_room **farm, int *room_counter);
+void 						free_current_farm(t_room **current_farm);
+void 						add_new_edge(t_room **farm, int from, int to, int weight);
+t_edge						*edge_copy(t_edge *edge)
 
 #endif
