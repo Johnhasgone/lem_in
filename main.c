@@ -12,16 +12,8 @@
 
 #include "lem_in.h"
 
-int get_max_path_count(t_room *farm);
 
-int ft_lst_length(t_list *list);
-
-void ft_farm_copy(t_room **farm, t_room **current_farm);
-
-void initialize_current_farm(t_room **current_farm);
-
-
-void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path);
+void bellman_ford_algo(t_list **shortest_path_list, t_room **farm, int room_counter);
 
 int			check_integer(char *str)
 {
@@ -118,12 +110,12 @@ int			analyze_line(char **line, int *ants, t_room **farm, int *room_counter)
 	else if (ft_strcmp(*line, "##start") == 0)
 	{
 		get_next_line(0, line);
-		return (analyze_room_line(*line, farm, room_counter, 1));
+		return (analyze_room_line(*line, farm, room_counter, START));
 	}
 	else if (ft_strcmp(*line, "##end") == 0)
 	{
 		get_next_line(0, line);
-		return (analyze_room_line(*line, farm, room_counter, 2));
+		return (analyze_room_line(*line, farm, room_counter, END));
 	}
 	else if (check_integer(*line) == 1)
 	{
@@ -150,6 +142,10 @@ int analyze_room_line(char *line, t_room **farm, int *room_counter, int type)
 		room->deg = 0;
 		room->type = type;
 		room->edges = NULL;
+		if (type == START)
+			room->dist = 0;
+		else
+			room->dist = INT32_MAX;
 		farm[(*room_counter)++] = room;
 		return (1);
 	}
@@ -166,6 +162,7 @@ t_room *clone_room(t_room *room)
 	clone_room->coordinates[1] = room->coordinates[1];
 	clone_room->deg = room->deg;
 	clone_room->type = DUPLICATE;
+	clone_room->dist = room->dist;
 	clone_room->edges = ft_lst_deep_copy(room->edges, edge_copy);
 	return clone_room;
 }
@@ -189,8 +186,10 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 		room_number = ((t_edge *) shortest_path->content)->from;
 		if (current_farm[room_number]->type == SIMPLE)
 		{
-			current_farm[*room_counter] = clone_room(current_farm[room_number]);
-			add_new_edge(current_farm, *room_counter, room_number, 0);
+			current_farm[*room_counter] = clone_room(current_farm[room_number]); // room_counter == out, room_number == in
+			remove_edges_to_out(current_farm, *room_counter);
+			remove_edges_from_in(&(current_farm[room_number]));
+			add_zero_edge(current_farm, *room_counter, room_number, 0);
 			(*room_counter)++;
 		}
 		shortest_path = shortest_path->next;
@@ -198,11 +197,41 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 	}
 }
 
-void add_new_edge(t_room **farm, int from, int to, int weight)
+void remove_edges_from_in(t_room **room_in)
+{
+	t_list **edges;
+	t_list *next_edge;
+
+	*edges = (*room_in)->edges;
+
+	while (*edges)
+	{
+		next_edge = (*edges)->next;
+		free((*edges)->content);
+		free((*edges));
+		*edges = next_edge;
+	}
+}
+
+void remove_edges_to_out(t_room **current_farm, int out) {
+	t_list	*edges;
+
+	int		neighbor_index;
+
+	edges = current_farm[out]->edges;
+	while (edges)
+	{
+		neighbor_index = ((t_edge*) edges->content)->to;
+		seek_and_destroy_edge(&current_farm[neighbor_index]->edges, neighbor_index, out);
+		edges = edges->next;
+	}
+}
+
+void add_zero_edge(t_room **farm, int from, int to, int weight)
 {
 	t_edge *new_edge;
 	new_edge = (t_edge*)malloc(sizeof(t_edge));
-	new_edge->from = from;
+	new_edge->from = from;                       // room_counter, from == out, room_number, to == in
 	new_edge->to = to;
 	new_edge->weight = weight;
 	ft_lstadd(&farm[from]->edges, (t_list*) new_edge);
@@ -266,16 +295,45 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 	while (i < max_path_count)
 	{
 		ft_farm_copy(farm, current_farm);
-
 		if (i != 0)
 		{
 			reverse_shortest_paths(current_farm, shortest_path_list);
 			duplicate_rooms(current_farm, shortest_path_list, room_counter);
+			bellman_ford_algo(&shortest_path_list, current_farm, *room_counter);
 		}
 		i++;
 	}
 	free_current_farm(current_farm);
 	return shortest_path_list;
+}
+
+void bellman_ford_algo(t_list **shortest_path_list, t_room **farm, int room_counter)
+{
+	int i;
+	int j;
+	int to;
+	t_list *edges;
+
+	i = 0;
+	while (++i < room_counter)
+	{
+		j = 0;
+		while (j < room_counter)
+		{
+			if (farm[j]->dist != INT32_MAX)
+			{
+				edges = farm[j]->edges;
+				while (edges)
+				{
+					to = ((t_edge *) edges)->to;
+					if (farm[to]->dist > farm[j]->dist + ((t_edge *) edges->content)->weight)
+						farm[to]->dist = farm[j]->dist + ((t_edge *) edges->content)->weight;
+					edges = edges->next;
+				}
+			}
+			j++;
+		}
+	}
 }
 
 void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and destroy one of parallel edges
@@ -287,9 +345,49 @@ void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and
 	{
 		from = ((t_edge *) shortest_path->content)->from;
 		to = ((t_edge *) shortest_path->content)->to;
-		seek_and_minusize(current_farm[to]->edges, from, to); // find edge with direction from TO to FROM and set weight to -1
-		seek_and_destroy(current_farm[from]->edges, from, to); // find edge with direction from FROM to TO and DESTROY
+		seek_and_negate_edge(&current_farm[to]->edges, from, to); // find edge with direction from TO to FROM and set weight to -1
+		seek_and_destroy_edge(&current_farm[from]->edges, from, to); // find edge with direction from FROM to TO and DESTROY
 		shortest_path = shortest_path->next;
+	}
+}
+
+void seek_and_destroy_edge(t_list **edge_list, int from, int to) {
+	t_list *current_edge;
+	t_list *previous_edge;
+
+	current_edge = *edge_list;
+	previous_edge = NULL;
+	while (current_edge)
+	{
+		if (((t_edge*) current_edge->content)->to == to &&
+			((t_edge*) current_edge->content)->from == from)
+		{
+			if (previous_edge)
+				previous_edge->next = current_edge->next;
+			else
+				*edge_list = current_edge->next;
+			free(current_edge->content);
+			free(current_edge);
+			break;
+		}
+		previous_edge = current_edge;
+		current_edge = current_edge->next;
+	}
+}
+
+void seek_and_negate_edge(t_list **edge_list, int from, int to) {
+	t_list *current_edge;
+
+	current_edge = *edge_list;
+	while (current_edge)
+	{
+		if (((t_edge*) current_edge->content)->to == from &&
+			((t_edge*) current_edge->content)->from == to)
+		{
+			((t_edge*) current_edge->content)->weight = -1;
+			break;
+		}
+		current_edge = current_edge->next;
 	}
 }
 
