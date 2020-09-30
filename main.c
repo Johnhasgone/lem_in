@@ -13,7 +13,7 @@
 #include "lem_in.h"
 
 
-void bellman_ford_algo(t_list **shortest_path_list, t_room **farm, int room_counter);
+void bellman_ford_algo(t_room **farm, int room_counter);
 
 int			check_integer(char *str)
 {
@@ -299,7 +299,8 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 		{
 			reverse_shortest_paths(current_farm, shortest_path_list);
 			duplicate_rooms(current_farm, shortest_path_list, room_counter);
-			bellman_ford_algo(&shortest_path_list, current_farm, *room_counter);
+			bellman_ford_algo(current_farm, *room_counter);
+			get_shortest_path(current_farm, *room_counter	);
 		}
 		i++;
 	}
@@ -307,7 +308,7 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 	return shortest_path_list;
 }
 
-void bellman_ford_algo(t_list **shortest_path_list, t_room **farm, int room_counter)
+void bellman_ford_algo(t_room **farm, int room_counter)
 {
 	int i;
 	int j;
@@ -334,6 +335,24 @@ void bellman_ford_algo(t_list **shortest_path_list, t_room **farm, int room_coun
 			j++;
 		}
 	}
+}
+
+void get_shortest_path(t_room **farm, int room_counter)
+{
+	int i;
+
+	i = 0;
+	while (i < room_counter)
+	{
+		if (farm[i]->type == END)
+			break;
+		i++;
+	}
+	find_min_dist_connected_room_from_edge
+	add_found_room_to_shortest_path
+
+	farm[i]->edges
+
 }
 
 void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and destroy one of parallel edges
