@@ -16,7 +16,7 @@
 
 int check_for_connected_graph(t_room **farm, int room_counter);
 
-void collapse_shortest_path(t_room **farm, t_list *shortest_path);
+t_list * collapse_shortest_path(t_room **farm, t_list *shortest_path);
 
 int			check_integer(char *str)
 {
@@ -289,7 +289,7 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 	t_room	*current_farm[ROOM_NUM];
 	t_edge	**overlap_path_list;
 	t_list	*shortest_path_list;
-	t_list	*shortest_path_before_collapse;
+	t_list	*shortest_path;
 	int		max_path_count;
 	int		i;
 
@@ -307,17 +307,26 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 			bellman_ford_algo(current_farm, *room_counter);
 			if (!check_for_connected_graph(current_farm, *room_counter))
 				break;
-			shortest_path_before_collapse = get_shortest_path(current_farm, *room_counter);
-			collapse_shortest_path(farm, shortest_path_before_collapse);
+			shortest_path = get_shortest_path_before_collapse(current_farm,
+															  *room_counter);
+			shortest_path = collapse_shortest_path(farm, shortest_path);
+			delete_bilateral_edges_from overlap_path_list
 
 		}
+		else
+		{
+			bellman_ford_algo(current_farm, *room_counter);
+			if (!check_for_connected_graph(current_farm, *room_counter))
+				return (NULL);													// Check for NULL in calling function (unconnected graph!!!)
+		}
+		get_effectiveness_of_shortest_paths
 		i++;
 	}
 	free_current_farm(current_farm);
 	return shortest_path_list;
 }
 
-void collapse_shortest_path(t_room **farm, t_list *shortest_path)
+t_list *collapse_shortest_path(t_room **farm, t_list *shortest_path)
 {
 	t_edge* edge;
 	t_edge* next_edge;
@@ -342,6 +351,7 @@ void collapse_shortest_path(t_room **farm, t_list *shortest_path)
 			delete_zero_edge(&shortest_path);
 		shortest_path = shortest_path->next;
 	}
+	return shortest_path;
 }
 
 void	delete_zero_edge(t_list **shortest_path)
@@ -399,7 +409,7 @@ void bellman_ford_algo(t_room **farm, int room_counter)
 	}
 }
 
-t_list	*get_shortest_path(t_room **farm, int room_counter)
+t_list	*get_shortest_path_before_collapse(t_room **farm, int room_counter)
 {
 	int		i;
 	t_list*	shortest_path;
