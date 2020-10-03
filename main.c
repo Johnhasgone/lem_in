@@ -10,10 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdbool.h>
 #include "lem_in.h"
 
 
-void bellman_ford_algo(t_room **farm, int room_counter);
+int check_for_connected_graph(t_room **farm, int room_counter);
+
+void collapse_shortest_path(t_room **farm, t_list *shortest_path);
 
 int			check_integer(char *str)
 {
@@ -286,10 +289,12 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 	t_room	*current_farm[ROOM_NUM];
 	t_edge	**overlap_path_list;
 	t_list	*shortest_path_list;
+	t_list	*shortest_path_before_collapse;
 	int		max_path_count;
 	int		i;
 
 	max_path_count = get_max_path_count(*farm);
+	shortest_path_list = NULL;
 	initialize_current_farm(current_farm);
 	i = 0;
 	while (i < max_path_count)
@@ -300,12 +305,69 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 			reverse_shortest_paths(current_farm, shortest_path_list);
 			duplicate_rooms(current_farm, shortest_path_list, room_counter);
 			bellman_ford_algo(current_farm, *room_counter);
-			get_shortest_path(current_farm, *room_counter	);
+			if (!check_for_connected_graph(current_farm, *room_counter))
+				break;
+			shortest_path_before_collapse = get_shortest_path(current_farm, *room_counter);
+			collapse_shortest_path(farm, shortest_path_before_collapse);
+
 		}
 		i++;
 	}
 	free_current_farm(current_farm);
 	return shortest_path_list;
+}
+
+void collapse_shortest_path(t_room **farm, t_list *shortest_path)
+{
+	t_edge* edge;
+	t_edge* next_edge;
+
+	while (shortest_path)
+	{
+		edge = (t_edge *)shortest_path->content;
+		next_edge = (t_edge *)(shortest_path->next->content);
+		if (farm[edge->to]->type == DUPLICATE)
+		{
+			while (farm[edge->to]->edges)
+			{
+				if (((t_edge *)farm[edge->to]->edges->content)->weight == 0)
+				{
+					edge->to = ((t_edge *)farm[edge->to]->edges->content)->to;
+					break;
+				}
+				farm[edge->to]->edges = farm[edge->to]->edges->next;
+			}
+		}
+		if (next_edge != NULL && next_edge->weight == 0)
+			delete_zero_edge(&shortest_path);
+		shortest_path = shortest_path->next;
+	}
+}
+
+void	delete_zero_edge(t_list **shortest_path)
+{
+	t_list*	zero_edge;
+
+	zero_edge = (*shortest_path)->next;
+	(*shortest_path)->next = (*shortest_path)->next->next;
+	free(zero_edge);
+}
+
+int check_for_connected_graph(t_room **farm, int room_counter) {
+	int		i;
+
+	i = 0;
+	while (i < room_counter)
+	{
+		if (farm[i]->type == END)
+		{
+			if (farm[i]->dist == INT32_MAX)
+				return (0);
+			return (1);
+		}
+		i++;
+	}
+	return (0);
 }
 
 void bellman_ford_algo(t_room **farm, int room_counter)
@@ -337,22 +399,47 @@ void bellman_ford_algo(t_room **farm, int room_counter)
 	}
 }
 
-void get_shortest_path(t_room **farm, int room_counter)
+t_list	*get_shortest_path(t_room **farm, int room_counter)
 {
-	int i;
+	int		i;
+	t_list*	shortest_path;
 
 	i = 0;
+	shortest_path = NULL;
 	while (i < room_counter)
 	{
 		if (farm[i]->type == END)
 			break;
 		i++;
 	}
-	find_min_dist_connected_room_from_edge
-	add_found_room_to_shortest_path
+	fill_shortest_path(farm, i, &shortest_path);
+	return (shortest_path);
+}
 
-	farm[i]->edges
+void fill_shortest_path(t_room **farm, int room_number,
+						t_list **shortest_path)
+{
+	int min_dist;
+	t_list* min_dist_room_edge;
+	t_list *edges;
+	int min_dist_room_number;
 
+	min_dist = INT32_MAX;
+	min_dist_room_edge = NULL;
+	edges = farm[room_number]->edges;
+	while (edges)
+	{
+		if (farm[((t_edge*)edges->content)->to]->dist < min_dist)
+		{
+			min_dist = farm[((t_edge*)edges->content)->to]->dist;
+			min_dist_room_edge = edges;
+			min_dist_room_number = ((t_edge*)edges->content)->to;
+		}
+		edges = edges->next;
+	}
+	ft_lstadd(shortest_path, min_dist_room_edge);
+	if (farm[min_dist_room_number]->type != START)
+		fill_shortest_path(farm, min_dist_room_number, shortest_path);
 }
 
 void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and destroy one of parallel edges
