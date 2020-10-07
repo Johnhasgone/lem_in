@@ -14,9 +14,6 @@
 #include "lem_in.h"
 
 
-int check_for_connected_graph(t_room **farm, int room_counter);
-
-t_list * collapse_shortest_path(t_room **farm, t_list *shortest_path);
 
 int			check_integer(char *str)
 {
@@ -123,7 +120,8 @@ int			analyze_line(char **line, int *ants, t_room **farm, int *room_counter)
 	else if (check_integer(*line) == 1)
 	{
 		*ants = ft_atoi(*line);
-		return (1);
+		if (*ants >= 0)
+			return (1);
 	}
 	else if (*line[0] == '#')
 		return (1);
@@ -240,19 +238,17 @@ void add_zero_edge(t_room **farm, int from, int to, int weight)
 	ft_lstadd(&farm[from]->edges, (t_list*) new_edge);
 }
 
-int read_instructions(t_room **farm)
+int read_instructions(t_room **farm, int *ants)
 {
 	char 		*line;
-	int			ants;
 	int 		room_counter;
 
-	ants = -1;
 	room_counter = 0;
 	while (get_next_line(0, &line))
 	{
 		if (ft_strcmp(line, "end_input") == 0)
 			break;
-		if (!analyze_line(&line, &ants, farm, &room_counter)) {
+		if (!analyze_line(&line, ants, farm, &room_counter)) {
 			write(2, "Incorrect farm instructions\n", 28);
 			exit(1);
 		}
@@ -266,10 +262,12 @@ int main()
 	t_queue 	*room_queue;
 	t_list		*shortest_path_list;
 	int			room_counter;
+	int			ants;
 
-	room_counter = read_instructions(farm);
+	ants = -1;
+	room_counter = read_instructions(farm, &ants);
 
-	shortest_path_list = find_shortest_paths(farm, &room_counter);
+	shortest_path_list = find_shortest_paths(farm, &room_counter, ants);
 
 	write_ant_moving(shortest_path_list);
 
@@ -284,7 +282,7 @@ int main()
 
 }
 
-t_list *find_shortest_paths(t_room **farm, int *room_counter)
+t_list *find_shortest_paths(t_room **farm, int *room_counter, int ants)
 {
 	t_room	*current_farm[ROOM_NUM];
 	t_edge	**overlap_path_list;
@@ -292,11 +290,16 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 	t_list	*shortest_path;
 	int		max_path_count;
 	int		i;
+	int 	effectiveness;
+	int 	current_effectiveness;
+	t_list *best_path_list;
 
 	max_path_count = get_max_path_count(*farm);
 	shortest_path_list = NULL;
 	initialize_current_farm(current_farm);
 	i = 0;
+	effectiveness = INT32_MAX;
+	best_path_list = NULL;
 	while (i < max_path_count)
 	{
 		ft_farm_copy(farm, current_farm);
@@ -310,8 +313,7 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 			shortest_path = get_shortest_path_before_collapse(current_farm,
 															  *room_counter);
 			shortest_path = collapse_shortest_path(farm, shortest_path);
-			delete_bilateral_edges_from overlap_path_list
-
+			delete_bilateral_edges(shortest_path, &shortest_path_list);
 		}
 		else
 		{
@@ -319,14 +321,138 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter)
 			if (!check_for_connected_graph(current_farm, *room_counter))
 				return (NULL);													// Check for NULL in calling function (unconnected graph!!!)
 		}
-		get_effectiveness_of_shortest_paths
+		current_effectiveness = get_effectiveness_of_shortest_path_list(
+				shortest_path_list, ants, i + 1, NULL); // i + 1 - count of paths
+		if (current_effectiveness <= effectiveness)
+		{
+			effectiveness = current_effectiveness;
+			best_path_list = ft_lst_deep_copy(shortest_path_list);
+		}
+		else
+			break ;
 		i++;
 	}
 	free_current_farm(current_farm);
-	return shortest_path_list;
+	//ft_free_lst(shortest_path_list);
+	return best_path_list;
 }
 
-t_list *collapse_shortest_path(t_room **farm, t_list *shortest_path)
+int
+get_effectiveness_of_shortest_path_list(t_list *shortest_path_list, int ants,
+										int iter, t_room **farm)
+{
+	int		*path_length_array;
+	t_list	*shortest_path_list_copy;
+	int		i;
+	int		effectiveness;
+	int		min;
+	int		j;
+
+	i = 0;
+	effectiveness = 0;
+	shortest_path_list_copy = shortest_path_list;
+	path_length_array = (int*)malloc(sizeof(int) * iter);
+	while (shortest_path_list)
+	{
+		if (farm[((t_edge*)(shortest_path_list->content))->from]->type == START)
+			path_length_array[i++] = get_path_length(shortest_path_list_copy,
+													 ((t_edge *) (shortest_path_list->content))->to,
+													 farm);
+		shortest_path_list = shortest_path_list->next;
+	}
+	min = find_min_length(path_length_array, iter);
+	while (ants > 0)
+	{
+		while (j < iter)
+		{
+			if (path_length_array[j] == min)
+			{
+				path_length_array[j]++;
+				ants--;
+				if (ants == 0)
+					break ;
+			}
+			j++;
+		}
+		effectiveness++;
+		min++;
+	}
+	free(path_length_array);
+	return effectiveness;
+}
+
+int find_min_length(int *path_length_array, int iter)
+{
+	int	min;
+	int	i;
+
+	min = path_length_array[0];
+	i = 1;
+	while (i < iter)
+	{
+		if (path_length_array[i] < min)
+			min = path_length_array[i];
+		i++;
+	}
+	return min;
+}
+
+int get_path_length(t_list *shortest_path_list, int to, t_room **farm)
+{
+	int length;
+	t_list	*shortest_path_list_copy;
+
+	length = 0;
+	shortest_path_list_copy = shortest_path_list;
+	while (shortest_path_list)
+	{
+		if (((t_edge*)(shortest_path_list->content))->from == to)
+		{
+			length++;
+			if (farm[((t_edge*)(shortest_path_list->content))->to]->type == END)
+				break ;
+			to = ((t_edge*)(shortest_path_list->content))->to;
+			shortest_path_list = shortest_path_list_copy;
+		}
+		else
+			shortest_path_list = shortest_path_list->next;
+	}
+	return (length);
+}
+
+void	delete_bilateral_edges(t_list *shortest_path, t_list **shortest_path_list)
+{
+	t_list	*shortest_path_list_copy;
+	t_list	*previous_edge;
+
+	shortest_path_list_copy = *shortest_path_list;
+	previous_edge = NULL;
+	while (shortest_path)
+	{
+		while (shortest_path_list_copy)
+		{
+			if (((t_edge*)(shortest_path_list_copy->content))->to == ((t_edge*)(shortest_path->content))->from
+					&& ((t_edge*)(shortest_path_list_copy->content))->from == ((t_edge*)(shortest_path->content))->to)
+			{
+				if (previous_edge == NULL)
+				{
+					previous_edge = *shortest_path_list;
+					*shortest_path_list = (*shortest_path_list)->next;
+					free(previous_edge);
+				}
+				else
+					delete_zero_edge(&previous_edge);
+				break ;
+			}
+			ft_lstadd(shortest_path_list, shortest_path);
+			previous_edge = shortest_path_list_copy;
+			shortest_path_list_copy = shortest_path_list_copy->next;
+		}
+		shortest_path = shortest_path->next;
+	}
+}
+
+t_list *collapse_shortest_path(t_room **farm, t_list *shortest_path)			// collapse duplicate vertices in shortest path
 {
 	t_edge* edge;
 	t_edge* next_edge;
@@ -358,6 +484,8 @@ void	delete_zero_edge(t_list **shortest_path)
 {
 	t_list*	zero_edge;
 
+	if (shortest_path == NULL || *shortest_path == NULL)
+		return ;
 	zero_edge = (*shortest_path)->next;
 	(*shortest_path)->next = (*shortest_path)->next->next;
 	free(zero_edge);
