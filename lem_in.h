@@ -69,13 +69,13 @@ t_edge						*create_edge(int from, int to);
 void 						put_room(t_queue **room_queue, t_room *room);
 t_queue 					*create_queue_element(t_room *room);
 void 						write_ant_moving(t_list *shortest_path_list);
-t_list *find_shortest_paths(t_room **farm, int *room_counter, int ants);
+t_list						*find_shortest_paths(t_room **farm, int *room_counter, int ants);
 void 						free_current_farm(t_room **current_farm);
 void 						add_zero_edge(t_room **farm, int from, int to, int weight);
 t_edge						*edge_copy(t_edge *edge);
 void 						seek_and_negate_edge(t_list **edge_list, int from, int to);
 void 						seek_and_destroy_edge(t_list **edge_list, int from, int to);
-int							get_max_path_count(t_room *farm);
+int							get_max_path_count(t_room **farm, int room_counter);
 int							ft_lst_length(t_list *list);
 void						ft_farm_copy(t_room **farm, t_room **current_farm);
 void						initialize_current_farm(t_room **current_farm);
@@ -90,10 +90,11 @@ void 						delete_zero_edge(t_list **shortest_path);
 void						delete_bilateral_edges(t_list *shortest_path, t_list **shortest_path_list);
 int							check_for_connected_graph(t_room **farm, int room_counter);
 t_list						*collapse_shortest_path(t_room **farm, t_list *shortest_path);
-int
-get_effectiveness_of_shortest_path_list(t_list *shortest_path_list, int ants,
-										int iter, t_room **farm);
+int							get_effectiveness_of_shortest_path_list(
+		t_list *shortest_path_list, int ants, int iter, t_room **farm);
 int							get_path_length(t_list *shortest_path_list, int to, t_room **farm);
-int find_min_length(int *path_length_array, int iter);
+int							find_min_length(const int *path_length_array, int iter);
+t_room 						*clone_room(t_room *room);
+
 
 #endif

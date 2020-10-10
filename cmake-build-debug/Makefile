@@ -521,6 +521,33 @@ libft/ft_lst_check_add_end.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/libft/ft_lst_check_add_end.c.s
 .PHONY : libft/ft_lst_check_add_end.c.s
 
+libft/ft_lst_deep_copy.o: libft/ft_lst_deep_copy.c.o
+
+.PHONY : libft/ft_lst_deep_copy.o
+
+# target to build an object file
+libft/ft_lst_deep_copy.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o
+.PHONY : libft/ft_lst_deep_copy.c.o
+
+libft/ft_lst_deep_copy.i: libft/ft_lst_deep_copy.c.i
+
+.PHONY : libft/ft_lst_deep_copy.i
+
+# target to preprocess a source file
+libft/ft_lst_deep_copy.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.i
+.PHONY : libft/ft_lst_deep_copy.c.i
+
+libft/ft_lst_deep_copy.s: libft/ft_lst_deep_copy.c.s
+
+.PHONY : libft/ft_lst_deep_copy.s
+
+# target to generate assembly for a file
+libft/ft_lst_deep_copy.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/lem_in.dir/build.make CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.s
+.PHONY : libft/ft_lst_deep_copy.c.s
+
 libft/ft_lstadd.o: libft/ft_lstadd.c.o
 
 .PHONY : libft/ft_lstadd.o
@@ -2165,6 +2192,9 @@ help:
 	@echo "... libft/ft_lst_check_add_end.o"
 	@echo "... libft/ft_lst_check_add_end.i"
 	@echo "... libft/ft_lst_check_add_end.s"
+	@echo "... libft/ft_lst_deep_copy.o"
+	@echo "... libft/ft_lst_deep_copy.i"
+	@echo "... libft/ft_lst_deep_copy.s"
 	@echo "... libft/ft_lstadd.o"
 	@echo "... libft/ft_lstadd.i"
 	@echo "... libft/ft_lstadd.s"

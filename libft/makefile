@@ -24,10 +24,10 @@ SRC = ft_memset.c ft_bzero.c ft_memcpy.c ft_memccpy.c ft_memmove.c \
 		ft_itoa.c ft_putchar.c ft_putstr.c ft_putendl.c ft_putnbr.c \
 		ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c \
 		ft_lstnew.c ft_lstdelone.c ft_lstdel.c ft_lstadd.c ft_lstiter.c \
-		ft_lstmap.c ft_delmap.c \
-		ft_lstpop_end.c ft_lstadd_end.c ft_strlen_p.c ft_count_if.c ft_free_lst.c \
-		ft_lstpop.c \
-		ft_iswhitespace.c get_next_line.c ft_countrows.c ft_lst_check_add_end.c
+		ft_lstmap.c ft_delmap.c ft_lstpop_end.c ft_lstadd_end.c ft_strlen_p.c \
+		ft_count_if.c ft_free_lst.c ft_lstpop.c \
+		ft_iswhitespace.c get_next_line.c ft_countrows.c ft_lst_check_add_end.c \
+		ft_lst_deep_copy.c
 
 OBJ = $(subst .c,.o,$(SRC))
 

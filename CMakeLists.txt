@@ -77,4 +77,5 @@ add_executable(lem_in
         libft/ft_tolower.c
         libft/ft_toupper.c
         libft/get_next_line.c
+        libft/ft_lst_deep_copy.c
         libft/libft.h main.c lem_in.h queue.c)

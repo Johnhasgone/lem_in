@@ -125,6 +125,9 @@
 		<Unit filename="/Users/cimogene/42/lem_in/lem_in/libft/ft_lst_check_add_end.c">
 			<Option target="lem_in"/>
 		</Unit>
+		<Unit filename="/Users/cimogene/42/lem_in/lem_in/libft/ft_lst_deep_copy.c">
+			<Option target="lem_in"/>
+		</Unit>
 		<Unit filename="/Users/cimogene/42/lem_in/lem_in/libft/ft_lstadd.c">
 			<Option target="lem_in"/>
 		</Unit>
