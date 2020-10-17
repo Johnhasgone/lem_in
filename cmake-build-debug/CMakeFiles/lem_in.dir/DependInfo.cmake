@@ -18,6 +18,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_iswhitespace.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_iswhitespace.c.o"
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_itoa.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_itoa.c.o"
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_lst_check_add_end.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_lst_check_add_end.c.o"
+  "/Users/cimogene/42/lem_in/lem_in/libft/ft_lst_deep_copy.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o"
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_lstadd.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_lstadd.c.o"
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_lstadd_end.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_lstadd_end.c.o"
   "/Users/cimogene/42/lem_in/lem_in/libft/ft_lstdel.c" "/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles/lem_in.dir/libft/ft_lstdel.c.o"

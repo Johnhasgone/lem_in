@@ -13,6 +13,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/lem_in.dir/libft/ft_iswhitespace.c.o"
   "CMakeFiles/lem_in.dir/libft/ft_itoa.c.o"
   "CMakeFiles/lem_in.dir/libft/ft_lst_check_add_end.c.o"
+  "CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o"
   "CMakeFiles/lem_in.dir/libft/ft_lstadd.c.o"
   "CMakeFiles/lem_in.dir/libft/ft_lstadd_end.c.o"
   "CMakeFiles/lem_in.dir/libft/ft_lstdel.c.o"

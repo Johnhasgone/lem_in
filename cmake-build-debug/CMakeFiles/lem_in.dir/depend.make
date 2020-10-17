@@ -33,6 +33,9 @@ CMakeFiles/lem_in.dir/libft/ft_itoa.c.o: ../libft/libft.h
 CMakeFiles/lem_in.dir/libft/ft_lst_check_add_end.c.o: ../libft/ft_lst_check_add_end.c
 CMakeFiles/lem_in.dir/libft/ft_lst_check_add_end.c.o: ../libft/libft.h
 
+CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o: ../libft/ft_lst_deep_copy.c
+CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o: ../libft/libft.h
+
 CMakeFiles/lem_in.dir/libft/ft_lstadd.c.o: ../libft/ft_lstadd.c
 CMakeFiles/lem_in.dir/libft/ft_lstadd.c.o: ../libft/libft.h
 

@@ -1000,9 +1000,22 @@ CMakeFiles/lem_in.dir/libft/get_next_line.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/lem_in.dir/libft/get_next_line.c.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/cimogene/42/lem_in/lem_in/libft/get_next_line.c -o CMakeFiles/lem_in.dir/libft/get_next_line.c.s
 
+CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o: CMakeFiles/lem_in.dir/flags.make
+CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o: ../libft/ft_lst_deep_copy.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o   -c /Users/cimogene/42/lem_in/lem_in/libft/ft_lst_deep_copy.c
+
+CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/cimogene/42/lem_in/lem_in/libft/ft_lst_deep_copy.c > CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.i
+
+CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/cimogene/42/lem_in/lem_in/libft/ft_lst_deep_copy.c -o CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.s
+
 CMakeFiles/lem_in.dir/main.c.o: CMakeFiles/lem_in.dir/flags.make
 CMakeFiles/lem_in.dir/main.c.o: ../main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_72) "Building C object CMakeFiles/lem_in.dir/main.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/lem_in.dir/main.c.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/lem_in.dir/main.c.o   -c /Users/cimogene/42/lem_in/lem_in/main.c
 
 CMakeFiles/lem_in.dir/main.c.i: cmake_force
@@ -1015,7 +1028,7 @@ CMakeFiles/lem_in.dir/main.c.s: cmake_force
 
 CMakeFiles/lem_in.dir/queue.c.o: CMakeFiles/lem_in.dir/flags.make
 CMakeFiles/lem_in.dir/queue.c.o: ../queue.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_73) "Building C object CMakeFiles/lem_in.dir/queue.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Building C object CMakeFiles/lem_in.dir/queue.c.o"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/lem_in.dir/queue.c.o   -c /Users/cimogene/42/lem_in/lem_in/queue.c
 
 CMakeFiles/lem_in.dir/queue.c.i: cmake_force
@@ -1099,6 +1112,7 @@ lem_in_OBJECTS = \
 "CMakeFiles/lem_in.dir/libft/ft_tolower.c.o" \
 "CMakeFiles/lem_in.dir/libft/ft_toupper.c.o" \
 "CMakeFiles/lem_in.dir/libft/get_next_line.c.o" \
+"CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o" \
 "CMakeFiles/lem_in.dir/main.c.o" \
 "CMakeFiles/lem_in.dir/queue.c.o"
 
@@ -1176,11 +1190,12 @@ lem_in: CMakeFiles/lem_in.dir/libft/ft_strtrim.c.o
 lem_in: CMakeFiles/lem_in.dir/libft/ft_tolower.c.o
 lem_in: CMakeFiles/lem_in.dir/libft/ft_toupper.c.o
 lem_in: CMakeFiles/lem_in.dir/libft/get_next_line.c.o
+lem_in: CMakeFiles/lem_in.dir/libft/ft_lst_deep_copy.c.o
 lem_in: CMakeFiles/lem_in.dir/main.c.o
 lem_in: CMakeFiles/lem_in.dir/queue.c.o
 lem_in: CMakeFiles/lem_in.dir/build.make
 lem_in: CMakeFiles/lem_in.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_74) "Linking C executable lem_in"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/cimogene/42/lem_in/lem_in/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_75) "Linking C executable lem_in"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/lem_in.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
