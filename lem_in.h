@@ -80,7 +80,6 @@ int							ft_lst_length(t_list *list);
 void						ft_farm_copy(t_room **farm, t_room **current_farm);
 void						initialize_current_farm(t_room **current_farm);
 void						reverse_shortest_paths(t_room **current_farm, t_list *shortest_path);
-void						remove_edges_to_out(t_room **current_farm, int out);
 void						remove_edges_from_in(t_room **room_in);
 t_list						*get_shortest_path_before_collapse(t_room **farm, int room_counter);
 void						bellman_ford_algo(t_room **farm, int room_counter);
@@ -94,7 +93,7 @@ int							get_effectiveness_of_shortest_path_list(
 		t_list *shortest_path_list, int ants, int iter, t_room **farm);
 int							get_path_length(t_list *shortest_path_list, int to, t_room **farm);
 int							find_min_length(const int *path_length_array, int iter);
-t_room 						*clone_room(t_room *room);
+t_room *clone_room(t_room *room, int room_counter);
 
 
 #endif

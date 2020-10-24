@@ -32,6 +32,17 @@ void print_farm_debug(t_room **farm)
 	}
 }
 
+void print_edges_debug(t_list *edges) {
+	t_edge*	edge;
+
+	printf("================================================================\n");
+	while (edges)
+	{
+		edge = (t_edge*)edges->content;
+		printf("from: %d, to: %d, weight: %d\n", edge->from, edge->to, edge->weight);
+		edges = edges->next;
+	}
+}
 
 int			check_integer(char *str)
 {
@@ -173,7 +184,36 @@ int analyze_room_line(char *line, t_room **farm, int *room_counter, int type)
 	return (0);
 }
 
-t_room *clone_room(t_room *room)
+t_list *clone_edges(t_list *edges, int room_counter)
+{
+	t_list	*cloned_edges;
+	t_list	*previous_edge;
+	t_edge	*edge_content;
+
+	previous_edge = NULL;
+	while (edges)
+	{
+		if (((t_edge*) edges->content)->weight >= 0)
+		{
+			if (!(edge_content = (t_edge *) malloc(sizeof(t_edge))))
+				return NULL;
+			edge_content->from = room_counter;
+			edge_content->to = ((t_edge*) edges->content)->to;
+			edge_content->weight = ((t_edge*) edges->content)->weight;
+			if (!(cloned_edges = (t_list *) malloc(sizeof(t_list))))
+				return NULL;
+			cloned_edges->content = edge_content;
+			cloned_edges->content_size = sizeof(edge_content);
+			cloned_edges->next = previous_edge;
+			previous_edge = cloned_edges;
+		}
+		edges = edges->next;
+	}
+
+	return cloned_edges;
+}
+
+t_room *clone_room(t_room *room, int room_counter)
 {
 	t_room	*clone_room;
 
@@ -184,8 +224,7 @@ t_room *clone_room(t_room *room)
 	clone_room->deg = room->deg;
 	clone_room->type = DUPLICATE;
 	clone_room->dist = room->dist;
-	clone_room->edges = ft_lst_deep_copy(room->edges,
-										 (void *(*)(void *)) edge_copy);
+	clone_room->edges = clone_edges(room->edges, room_counter);
 	return clone_room;
 }
 
@@ -200,6 +239,31 @@ t_edge	*edge_copy(t_edge *edge)
 	return edge_copy;
 }
 
+void
+edit_edge_to_out(t_room **current_room, t_list *shortest_path, int in,
+				 int out)
+{
+	t_list	*edges;
+
+	while (shortest_path)
+	{
+		if (((t_edge*)shortest_path->content)->from == in)
+		{
+			edges = current_room[((t_edge*)shortest_path->content)->to]->edges;
+			while (edges)
+			{
+				if (((t_edge*)edges->content)->to == in)
+				{
+					((t_edge*)edges->content)->to = out;
+					return ;
+				}
+				edges = edges->next;
+			}
+		}
+		shortest_path = shortest_path->next;
+	}
+}
+
 void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_counter) {
 	int room_number;
 
@@ -211,13 +275,18 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 		if (current_farm[room_number]->type == SIMPLE)
 		{
 			(*room_counter)++;
-			current_farm[*room_counter] = clone_room(current_farm[room_number]); // room_counter == out, room_number == in
-			//!!!!!!! debug ne srabotalo udalenie rebra, smotret v sled raz!!!!!
-			remove_edges_to_out(current_farm, *room_counter);
+			current_farm[*room_counter] = clone_room(current_farm[room_number],
+													 *room_counter); // room_counter == out, room_number == in
+			printf("after duplicating room\n");
+			print_farm_debug(current_farm);
+			edit_edge_to_out(current_farm, shortest_path, room_number, *room_counter);
+			printf("after edit_edge_to_out\n");
 			print_farm_debug(current_farm);
 			remove_edges_from_in(&(current_farm[room_number]));
+			printf("after remove edges from in\n");
 			print_farm_debug(current_farm);
 			add_zero_edge(current_farm, *room_counter, room_number, 0);
+			printf("after add zero edge\n");
 			print_farm_debug(current_farm);
 		}
 		shortest_path = shortest_path->next;
@@ -227,46 +296,55 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 
 void remove_edges_from_in(t_room **room_in)
 {
-	t_list *edges;
-	t_list *next_edge;
-
-	edges = (*room_in)->edges;
-
-	while (edges)
-	{
-		next_edge = edges->next;
-		free(edges->content);
-		free(edges);
-		edges = NULL;
-		edges = next_edge;
-	}
-}
-
-void remove_edges_to_out(t_room **current_farm, int out) {
 	t_list	*edges;
+	t_list	*previous_edge;
+	t_list	*result_edges;
 
-	int		neighbor_index;
+	previous_edge = NULL;
+	edges = (*room_in)->edges;
+	result_edges = edges;
 
-	edges = current_farm[out]->edges;
 	while (edges)
 	{
-		t_edge* edge_debug = ((t_edge*) edges->content);
-		neighbor_index = ((t_edge*) edges->content)->to;
-		printf("remove_edges_to_out\n");
-		print_farm_debug(current_farm);
-		seek_and_destroy_edge(&current_farm[neighbor_index]->edges, neighbor_index, out);
-		edges = edges->next;
+		if (((t_edge*)edges->content)->weight == 1)
+		{
+			if (previous_edge == NULL)
+			{
+				result_edges = edges->next;
+				free(edges->content);
+				free(edges);
+				edges = result_edges;
+			}
+			else
+			{
+				previous_edge->next = edges->next;
+				free(edges->content);
+				free(edges);
+				edges = previous_edge->next;
+			}
+		}
+		else
+		{
+			previous_edge = edges;
+			edges = edges->next;
+		}
 	}
+	(*room_in)->edges = result_edges;
 }
 
 void add_zero_edge(t_room **farm, int from, int to, int weight)
 {
-	t_edge *new_edge;
+	t_edge  *new_edge;
+	t_list	*new_list;
 	new_edge = (t_edge*)malloc(sizeof(t_edge));
 	new_edge->from = from;                       // room_counter, from == out, room_number, to == in
 	new_edge->to = to;
 	new_edge->weight = weight;
-	ft_lstadd(&farm[from]->edges, (t_list*) new_edge);
+	new_list = (t_list*)malloc(sizeof(t_list));
+	new_list->content = new_edge;
+	new_list->content_size = sizeof(new_edge);
+	new_list->next = NULL;
+	ft_lstadd(&farm[from]->edges, new_list);
 }
 
 int read_instructions(t_room **farm, int *ants)
@@ -550,7 +628,7 @@ void bellman_ford_algo(t_room **farm, int room_counter)
 				{
 					edge_debug = (t_edge *) (edges->content);
 					to = ((t_edge *) (edges->content))->to;
-					if (farm[to]->dist > farm[j]->dist + ((t_edge *) edges->content)->weight)
+				 	if (farm[to]->dist > farm[j]->dist + ((t_edge *) edges->content)->weight)
 						farm[to]->dist = farm[j]->dist + ((t_edge *) edges->content)->weight;
 					edges = edges->next;
 				}
@@ -558,19 +636,11 @@ void bellman_ford_algo(t_room **farm, int room_counter)
 			j++;
 		}
 	}
+	printf("after bellman_ford\n");
+	print_farm_debug(farm);
 }
 
-void print_edges_debug(t_list *edges) {
-	t_edge*	edge;
 
-	printf("================================================================\n");
-	while (edges)
-	{
-		edge = (t_edge*)edges->content;
-		printf("from: %d, to: %d, weight: %d\n", edge->from, edge->to, edge->weight);
-		edges = edges->next;
-	}
-}
 
 t_list	*get_shortest_path_before_collapse(t_room **farm, int room_counter)
 {
@@ -587,7 +657,8 @@ t_list	*get_shortest_path_before_collapse(t_room **farm, int room_counter)
 	}
 	//print_farm_debug(farm);
 	fill_shortest_path(farm, i, &shortest_path, farm[i]->dist);
-	//print_edges_debug(shortest_path);
+	printf("====inside get_shortest_path_before_collapse\n");
+	print_edges_debug(shortest_path);
 	return (shortest_path);
 }
 
@@ -605,7 +676,6 @@ void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
 	min_dist_room_number = room_number;
 	while (edges)
 	{
-		print_farm_debug(farm);
 		if (farm[((t_edge*)edges->content)->to]->dist < shortest_path_length)
 		{
 			shortest_path_length = farm[((t_edge*)edges->content)->to]->dist;
@@ -615,6 +685,8 @@ void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
 				if (((t_edge*)(adj_edges->content))->to == min_dist_room_number)
 				{
 					min_dist_room_edge = adj_edges;
+					printf("min_dist_room_edge");
+					print_edges_debug(min_dist_room_edge);
 					break ;
 				}
 				adj_edges = adj_edges->next;
@@ -623,11 +695,9 @@ void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
 		}
 		edges = edges->next;
 	}
-	print_farm_debug(farm);
 	edge_to_path = ft_lst_deep_copy(min_dist_room_edge,
 									(void *(*)(void *)) edge_copy);
 	ft_lstadd(shortest_path, edge_to_path);
-	print_farm_debug(farm);
 	min_dist_room_number = ((t_edge*)min_dist_room_edge->content)->from;
 	if (farm[min_dist_room_number]->type != START)
 		fill_shortest_path(farm, min_dist_room_number, shortest_path, shortest_path_length);
@@ -660,7 +730,6 @@ void seek_and_destroy_edge(t_list **edge_list, int from, int to) {
 
 	current_edge = *edge_list;
 	previous_edge = NULL;
-	print_edges_debug(current_edge);
 	while (current_edge)
 	{
 		if (((t_edge*) current_edge->content)->to == to &&
