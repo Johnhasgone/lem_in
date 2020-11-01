@@ -47,11 +47,9 @@ typedef struct		s_room
 	int				coordinates[2];
 	t_list			*out_edges;
 	t_list			*in_edges;
-	int				deg;
 	e_room_type		type;	// 0 - ordinary, 1 - start, 2 - finish, 3 - duplicated    USE ENUM FOR TYPES OF ROOMS (check the Norm)
 	int 			dist;
 	int 			way;    // 1 - included in a way for ants, 0 - not included
-	int				twin;
 }					t_room;
 
 // queue for breadth search

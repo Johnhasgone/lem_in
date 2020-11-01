@@ -22,7 +22,7 @@ t_list *ft_node_copy(t_list *list, void* (*ft_struct_copy)(void *))
 	list_copy->content = ft_struct_copy(list->content);
 	list_copy->content_size = list->content_size;
 	list_copy->next = NULL;
-	return list_copy;
+	return (list_copy);
 }
 
 t_list		*ft_lst_deep_copy(t_list *list, void* (*ft_struct_copy)(void *))
@@ -31,6 +31,7 @@ t_list		*ft_lst_deep_copy(t_list *list, void* (*ft_struct_copy)(void *))
 	t_list	*list_copy_start;
 	t_list	*list_copy_prev;
 
+	list_copy_start = NULL;
 	if (list)
 	{
 		list_copy = ft_node_copy(list, ft_struct_copy);
@@ -38,7 +39,6 @@ t_list		*ft_lst_deep_copy(t_list *list, void* (*ft_struct_copy)(void *))
 		list_copy_prev = list_copy;
 		list_copy_start = list_copy;
 	}
-
 	while (list)
 	{
 		list_copy = ft_node_copy(list, ft_struct_copy);
@@ -46,6 +46,6 @@ t_list		*ft_lst_deep_copy(t_list *list, void* (*ft_struct_copy)(void *))
 		list_copy_prev->next = list_copy;
 		list_copy_prev = list_copy;
 	}
-	return list_copy_start;
+	return (list_copy_start);
 }
 
