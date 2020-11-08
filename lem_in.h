@@ -64,8 +64,7 @@ typedef struct				s_queue
 
 int							analyze_room_line(char *line, t_room **farm, int *room_counter, int type);
 int							analyze_edge_line(char *line, t_room **farm, int room_counter);
-void						set_weight(t_edge **edge, int weight);
-t_edge						*create_edge(int from, int to);
+t_edge *create_edge(int from, int to, int weight);
 void 						put_room(t_queue **room_queue, t_room *room);
 t_queue 					*create_queue_element(t_room *room);
 void 						write_ant_moving(t_list *shortest_path_list);
@@ -93,7 +92,7 @@ int							get_effectiveness_of_shortest_path_list(
 		t_list *shortest_path_list, int ants, int iter, t_room **farm);
 int							get_path_length(t_list *shortest_path_list, int to, t_room **farm);
 int							find_min_length(const int *path_length_array, int iter);
-t_room *clone_room(t_room *room, int room_counter);
+t_room *clone_room(t_room *room, int room_counter, int next_room);
 
 
 #endif

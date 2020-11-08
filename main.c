@@ -20,7 +20,7 @@ void print_farm_debug(t_room **farm)
 	printf("========================================================\n");
 	while(farm[i])
 	{
-		printf("name: %s, index: %d, type: %d, dist: %d, twin: %d\n", farm[i]->name, i, farm[i]->type, farm[i]->dist, farm[i]->twin);
+		printf("name: %s, index: %d, type: %d, dist: %d\n", farm[i]->name, i, farm[i]->type, farm[i]->dist);
 		edges = farm[i]->out_edges;
 		while(edges)
 		{
@@ -104,10 +104,8 @@ int analyze_edge_line(char *line, t_room **farm, int room_counter)
 	}
 	if (i != room_counter && j != room_counter)
 	{
-		edge_from = create_edge(i, j);
-		set_weight(&edge_from, 1);
-		edge_to = create_edge(j, i);
-		set_weight(&edge_to, 1);
+		edge_from = create_edge(i, j, 1);
+		edge_to = create_edge(j, i, 1);
 		ft_lstadd_end(&(farm[i]->out_edges), ft_lstnew(edge_from, sizeof(*edge_from)));
 		ft_lstadd_end(&(farm[j]->out_edges), ft_lstnew(edge_to, sizeof(*edge_to)));
 		ft_lstadd_end(&(farm[i]->in_edges), ft_lstnew(edge_to, sizeof(*edge_to)));
@@ -119,18 +117,14 @@ int analyze_edge_line(char *line, t_room **farm, int room_counter)
 	return (0);
 }
 
-/* setting weight of an edge */
-void		set_weight(t_edge **edge, int weight) {
-	(*edge)->weight = weight;
-}
-
 /* creating a new edge between rooms */
-t_edge		*create_edge(int from, int to) {
+t_edge *create_edge(int from, int to, int weight) {
 	t_edge *edge;
 
 	edge = (t_edge*)malloc(sizeof(t_edge));
 	edge->from = from;
 	edge->to = to;
+	edge->weight = weight;
 	return edge;
 }
 
@@ -222,17 +216,18 @@ t_list *clone_edges(t_list *edges, int room_counter)
 	return (cloned_edges);
 }
 
-t_room *clone_room(t_room *room, int room_counter)
+t_room *clone_room(t_room *room, int room_counter, int next_room)
 {
 	t_room	*clone_room;
 
 	clone_room = (t_room*)malloc(sizeof(t_room));
 	clone_room->name = ft_strjoin(room->name, "_duplicate");
 	clone_room->coordinates[0] = room->coordinates[0];
-	clone_room->coordinates[1] = room->coordinates[1];+
+	clone_room->coordinates[1] = room->coordinates[1];
 	clone_room->type = DUPLICATE;
 	clone_room->dist = room->dist;
 	clone_room->out_edges = clone_edges(room->out_edges, room_counter);
+	clone_room->in_edges = ft_lstnew(create_edge(next_room, room_counter, -1), sizeof(t_edge));
 	return (clone_room);
 }
 
@@ -247,12 +242,18 @@ t_edge	*edge_copy(t_edge *edge)
 	return (edge_copy);
 }
 
+/*
+ * edit edge to out in shortest path ()
+ */
 void
 edit_edge_to_out(t_room **current_room, t_list *shortest_path, int in,
 				 int out)
 {
 	t_list	*edges;
+	int		from;
+	t_list	*previous_edge;
 
+	previous_edge = NULL;
 	while (shortest_path)
 	{
 		if (((t_edge*)shortest_path->content)->from == in)
@@ -263,7 +264,26 @@ edit_edge_to_out(t_room **current_room, t_list *shortest_path, int in,
 				if (((t_edge*)edges->content)->to == in)
 				{
 					((t_edge*)edges->content)->to = out;
-					ft_lstadd()
+					from = ((t_edge*)edges->content)->from;
+					edges = current_room[in]->in_edges;
+					while (edges)
+					{
+						if (((t_edge*)edges->content)->from == from
+							&& ((t_edge*)edges->content)->to == in)
+						{
+							if (previous_edge == NULL)
+							{
+								previous_edge = edges;
+								current_room[in]->in_edges = edges->next;
+								free(previous_edge);
+							}
+							else
+								delete_zero_edge(&previous_edge);
+							break ;
+						}
+						previous_edge = edges;
+						edges = edges->next;
+					}
 					return ;
 				}
 				edges = edges->next;
@@ -279,13 +299,14 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 	while (shortest_path)
 	{
 		room_number = ((t_edge *) shortest_path->content)->from;
+
 		printf("duplicate_rooms\n");
 		print_farm_debug(current_farm);
 		if (current_farm[room_number]->type == SIMPLE)
 		{
 			(*room_counter)++;
 			current_farm[*room_counter] = clone_room(current_farm[room_number],
-													 *room_counter); // room_counter == out, room_number == in
+													 *room_counter, ((t_edge *) shortest_path->content)->to); // room_counter == out, room_number == in
 			printf("after duplicating room\n");
 			print_farm_debug(current_farm);
 			edit_edge_to_out(current_farm, shortest_path, room_number, *room_counter);
@@ -354,6 +375,8 @@ void add_zero_edge(t_room **farm, int from, int to, int weight)
 	new_list->content_size = sizeof(new_edge);
 	new_list->next = NULL;
 	ft_lstadd(&farm[from]->out_edges, new_list);
+	ft_lstadd(&farm[to]->in_edges, ft_lst_deep_copy(new_list, (void *(*)(
+			void *)) edge_copy));
 }
 
 int read_instructions(t_room **farm, int *ants)
@@ -402,6 +425,8 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter, int ants)
 			printf("find_shortest_paths - after reverse_shortest_paths\n");
 			print_farm_debug(current_farm);
 			duplicate_rooms(current_farm, shortest_path_list, room_counter);
+			printf("after duplicate room===============\n");
+			print_farm_debug(current_farm);
 			bellman_ford_algo(current_farm, *room_counter);
 			if (!check_for_connected_graph(current_farm, *room_counter))
 				break ;
@@ -712,9 +737,11 @@ void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and
 		printf("reverse_shortest_paths - before seek_and_negate\n");
 		print_farm_debug(current_farm);
 		seek_and_negate_edge(&current_farm[to]->out_edges, from, to); // find edge with direction from TO to FROM and set weight to -1
+		seek_and_negate_edge(&current_farm[from]->in_edges, from, to); // find edge with direction from TO to FROM and set weight to -1
 		printf("reverse_shortest_paths - after seek_and_negate\n");
 		print_farm_debug(current_farm);
 		seek_and_destroy_edge(&current_farm[from]->out_edges, from, to); // find edge with direction from FROM to TO and DESTROY
+		seek_and_destroy_edge(&current_farm[to]->in_edges, from, to); // find edge with direction from FROM to TO and DESTROY in in_edges
 		printf("reverse_shortest_paths - after seek_and_destroy\n");
 		print_farm_debug(current_farm);
 		shortest_path = shortest_path->next;
