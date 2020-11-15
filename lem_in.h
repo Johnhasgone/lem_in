@@ -82,8 +82,7 @@ void						reverse_shortest_paths(t_room **current_farm, t_list *shortest_path);
 void						remove_edges_from_in(t_room **room_in);
 t_list						*get_shortest_path_before_collapse(t_room **farm, int room_counter);
 void						bellman_ford_algo(t_room **farm, int room_counter);
-void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
-						int shortest_path_length);
+void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path);
 void 						delete_zero_edge(t_list **shortest_path);
 void						delete_bilateral_edges(t_list *shortest_path, t_list **shortest_path_list);
 int							check_for_connected_graph(t_room **farm, int room_counter);

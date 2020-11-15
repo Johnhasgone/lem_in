@@ -13,6 +13,9 @@
 #include <printf.h>
 #include "lem_in.h"
 
+void switch_edges_to_duplicate(t_room **current_farm, int duplicate_room,
+							   int original_room);
+
 void print_farm_debug(t_room **farm)
 {
 	int i = 0;
@@ -318,9 +321,38 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 			add_zero_edge(current_farm, *room_counter, room_number, 0);
 			printf("after add zero edge\n");
 			print_farm_debug(current_farm);
+			switch_edges_to_duplicate(current_farm, *room_counter, room_number);
+			printf("after switching edges to duplicate\n");
+			print_farm_debug(current_farm);
 		}
 		shortest_path = shortest_path->next;
 
+	}
+}
+
+void switch_edges_to_duplicate(t_room **current_farm, int duplicate_room,
+							   int original_room) {
+	t_list	*duplicate_edges_out;
+	t_list	*adjacent_edges_in;
+
+	duplicate_edges_out = current_farm[duplicate_room]->out_edges;
+
+	while (duplicate_edges_out)
+	{
+		if (((t_edge*)(duplicate_edges_out->content))->weight == 1)
+		{
+			adjacent_edges_in = current_farm[((t_edge*)(duplicate_edges_out->content))->to]->in_edges;
+			while (adjacent_edges_in)
+			{
+				if (((t_edge*)(adjacent_edges_in->content))->from == original_room)
+				{
+					((t_edge*)(adjacent_edges_in->content))->from = duplicate_room;
+					break ;
+				}
+				adjacent_edges_in = adjacent_edges_in->next;
+			}
+		}
+		duplicate_edges_out = duplicate_edges_out->next;
 	}
 }
 
@@ -432,8 +464,14 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter, int ants)
 				break ;
 			shortest_path = get_shortest_path_before_collapse(current_farm,
 															  *room_counter);
-			shortest_path = collapse_shortest_path(farm, shortest_path);
+			printf("shortest path before collapse\n");
+			print_edges_debug(shortest_path);
+			shortest_path = collapse_shortest_path(current_farm, shortest_path);
+			printf("shortest path after collapse\n");
+			print_edges_debug(shortest_path);
 			delete_bilateral_edges(shortest_path, &shortest_path_list);
+			printf("shortest path after delete bilateral edges\n");
+			print_edges_debug(shortest_path_list);
 		}
 		else
 		{
@@ -473,7 +511,7 @@ get_effectiveness_of_shortest_path_list(t_list *shortest_path_list, int ants,
 	int		i;
 	int		effectiveness;
 	int		min;
-	int		j;
+	int		min_copy;
 
 	i = 0;
 	effectiveness = 0;
@@ -488,25 +526,26 @@ get_effectiveness_of_shortest_path_list(t_list *shortest_path_list, int ants,
 		shortest_path_list = shortest_path_list->next;
 	}
 	min = find_min_length(path_length_array, iter);
+	min_copy = min - 1;
 	while (ants > 0)
 	{
-		j = 0;
-		while (j < iter)
+		i = 0;
+		while (i < iter)
 		{
-			if (path_length_array[j] == min)
+			if (path_length_array[i] == min)
 			{
-				path_length_array[j]++;
+				path_length_array[i]++;
 				ants--;
 				if (ants == 0)
 					break ;
 			}
-			j++;
+			i++;
 		}
 		effectiveness++;
 		min++;
 	}
 	free(path_length_array);
-	return effectiveness;
+	return effectiveness + min_copy;
 }
 
 int find_min_length(const int *path_length_array, int iter)
@@ -534,7 +573,7 @@ int get_path_length(t_list *shortest_path_list, int to, t_room **farm)
 	int length;
 	t_list	*shortest_path_list_copy;
 
-	length = 0;
+	length = 1;
 	shortest_path_list_copy = shortest_path_list;
 	while (shortest_path_list)
 	{
@@ -555,14 +594,22 @@ int get_path_length(t_list *shortest_path_list, int to, t_room **farm)
 void	delete_bilateral_edges(t_list *shortest_path, t_list **shortest_path_list)
 {
 	t_list	*shortest_path_list_copy;
+	t_list	*initial_shortest_path_list;
 	t_list	*previous_edge;
+	int 	is_bilateral;
 
-	shortest_path_list_copy = *shortest_path_list;
-	previous_edge = NULL;
+	initial_shortest_path_list = *shortest_path_list;
 	while (shortest_path)
 	{
+		is_bilateral = 0;
+		shortest_path_list_copy = initial_shortest_path_list;
+		previous_edge = NULL;
 		while (shortest_path_list_copy)
 		{
+			printf("shortest_path=======");
+			print_edges_debug(shortest_path);
+			printf("shortest_path_list=======");
+			print_edges_debug(*shortest_path_list);
 			if (((t_edge*)(shortest_path_list_copy->content))->to == ((t_edge*)(shortest_path->content))->from
 					&& ((t_edge*)(shortest_path_list_copy->content))->from == ((t_edge*)(shortest_path->content))->to)
 			{
@@ -574,12 +621,16 @@ void	delete_bilateral_edges(t_list *shortest_path, t_list **shortest_path_list)
 				}
 				else
 					delete_zero_edge(&previous_edge);
+				is_bilateral = 1;
 				break ;
 			}
-			ft_lstadd(shortest_path_list, shortest_path);
 			previous_edge = shortest_path_list_copy;
 			shortest_path_list_copy = shortest_path_list_copy->next;
 		}
+		if (!is_bilateral)
+			ft_lstadd(shortest_path_list, ft_lst_deep_copy(shortest_path,
+													   (void *(*)(
+															   void *)) edge_copy));
 		shortest_path = shortest_path->next;
 	}
 }
@@ -589,6 +640,9 @@ t_list *collapse_shortest_path(t_room **farm, t_list *shortest_path)			// collap
 	t_edge* edge;
 	t_edge* next_edge;
 
+	t_list*	shortest_path_copy;
+
+	shortest_path_copy = shortest_path;
 	while (shortest_path)
 	{
 		edge = (t_edge *)shortest_path->content;
@@ -603,16 +657,28 @@ t_list *collapse_shortest_path(t_room **farm, t_list *shortest_path)			// collap
 				if (((t_edge *)farm[edge->to]->out_edges->content)->weight == 0)
 				{
 					edge->to = ((t_edge *)farm[edge->to]->out_edges->content)->to;
-					break;
+					break ;
 				}
 				farm[edge->to]->out_edges = farm[edge->to]->out_edges->next;
+			}
+		}
+		else if (farm[edge->from]->type == DUPLICATE)
+		{
+			while (farm[edge->from]->out_edges)
+			{
+				if (((t_edge *)farm[edge->from]->out_edges->content)->weight == 0)
+				{
+					edge->from = ((t_edge *)farm[edge->from]->out_edges->content)->to;
+					break ;
+				}
+				farm[edge->from]->out_edges = farm[edge->from]->out_edges->next;
 			}
 		}
 		if (next_edge != NULL && next_edge->weight == 0)
 			delete_zero_edge(&shortest_path);
 		shortest_path = shortest_path->next;
 	}
-	return shortest_path;
+	return shortest_path_copy;
 }
 
 void	delete_zero_edge(t_list **shortest_path)
@@ -691,28 +757,29 @@ t_list	*get_shortest_path_before_collapse(t_room **farm, int room_counter)
 			break ;
 		i++;
 	}
-	fill_shortest_path(farm, i, &shortest_path, farm[i]->dist);
+	fill_shortest_path(farm, i, &shortest_path);
 	printf("====================inside get_shortest_path_before_collapse==========================\n");
 	print_edges_debug(shortest_path);
 	return (shortest_path);
 }
 
-void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
-						int shortest_path_length)
+void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path)
 {
 	t_list* min_dist_room_edge;
 	t_list *edges;
 	int min_dist_room_number;
 	t_list*	edge_to_path;
+	int min_adjacent_distance;
 
 	min_dist_room_edge = NULL;
 	edges = farm[room_number]->in_edges;
 	min_dist_room_number = room_number;
+	min_adjacent_distance = INT32_MAX;
 	while (edges)
 	{
-		if (farm[((t_edge*)edges->content)->from]->dist < shortest_path_length)
+		if (farm[((t_edge*)edges->content)->from]->dist < min_adjacent_distance)
 		{
-			shortest_path_length = farm[((t_edge*)edges->content)->from]->dist;
+			min_adjacent_distance = farm[((t_edge*)edges->content)->from]->dist;
 			min_dist_room_number = ((t_edge*)edges->content)->from;
 			min_dist_room_edge = edges;
 		}
@@ -722,7 +789,7 @@ void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
 									(void *(*)(void *)) edge_copy);
 	ft_lstadd(shortest_path, edge_to_path);
 	if (farm[min_dist_room_number]->type != START)
-		fill_shortest_path(farm, min_dist_room_number, shortest_path, shortest_path_length);
+		fill_shortest_path(farm, min_dist_room_number, shortest_path);
 }
 
 void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and destroy one of parallel out_edges
@@ -854,7 +921,9 @@ int ft_lst_length(t_list *list) {
 }
 
 void write_ant_moving(t_list *shortest_path_list) {
-	write(1, "hello, world!", 13);
+	write(1, "=============", 13);
+	print_edges_debug(shortest_path_list);
+
 }
 
 
