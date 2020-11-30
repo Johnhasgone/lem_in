@@ -67,8 +67,9 @@ int							analyze_edge_line(char *line, t_room **farm, int room_counter);
 t_edge *create_edge(int from, int to, int weight);
 void 						put_room(t_queue **room_queue, t_room *room);
 t_queue 					*create_queue_element(t_room *room);
-void 						write_ant_moving(t_list *shortest_path_list);
-t_list						*find_shortest_paths(t_room **farm, int *room_counter, int ants);
+void write_ant_moving(t_list *shortest_path_list, int ants, int effectiveness);
+t_list *find_shortest_paths(t_room **farm, int *room_counter, int ants,
+							int *effectiveness);
 void 						free_current_farm(t_room **current_farm);
 void 						add_zero_edge(t_room **farm, int from, int to, int weight);
 t_edge						*edge_copy(t_edge *edge);
