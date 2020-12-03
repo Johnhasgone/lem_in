@@ -105,6 +105,8 @@ void				ft_lstadd(t_list **alst, t_list *new);
 void				ft_lstiter(t_list *lst, void (*f)(t_list *elem));
 t_list				*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 t_list				*ft_lst_deep_copy(t_list *list, void* (*ft_struct_copy)(void *));
+t_list				*ft_node_copy(t_list *list, void* (*ft_struct_copy)(void *));
+
 
 int					get_next_line(const int fd, char **line);
 

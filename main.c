@@ -241,7 +241,7 @@ t_edge	*edge_copy(t_edge *edge)
 {
 	t_edge *edge_copy;
 
-	edge_copy = malloc(sizeof(t_edge));
+	edge_copy = (t_edge*)malloc(sizeof(t_edge));
 	edge_copy->from = edge->from;
 	edge_copy->to = edge->to;
 	edge_copy->weight = edge->weight;
@@ -311,19 +311,24 @@ void duplicate_rooms(t_room **current_farm, t_list *shortest_path, int *room_cou
 		if (current_farm[room_number]->type == SIMPLE)
 		{
 			(*room_counter)++;
+			printf("314. %zu\n", current_farm[1058]->in_edges->content_size);
 			current_farm[*room_counter] = clone_room(current_farm[room_number],
 													 *room_counter, ((t_edge *) shortest_path->content)->to); // room_counter == out, room_number == in
 			//printf("after duplicating room\n");
 			//print_farm_debug(current_farm);
+			printf("319. %zu\n", current_farm[1058]->in_edges->content_size);
 			edit_edge_to_out(current_farm, shortest_path, room_number, *room_counter);
 			//printf("after edit_edge_to_out\n");
 			//print_farm_debug(current_farm);
+			printf("323. %zu\n", current_farm[1058]->in_edges->content_size);
 			remove_edges_from_in(&(current_farm[room_number]));
 			//printf("after remove out_edges from in\n");
 			//print_farm_debug(current_farm);
+			printf("327. %zu\n", current_farm[1058]->in_edges->content_size);
 			add_zero_edge(current_farm, *room_counter, room_number, 0);
 			//printf("after add zero edge\n");
 			//print_farm_debug(current_farm);
+			printf("331. %zu\n", current_farm[1058]->in_edges->content_size);
 			switch_edges_to_duplicate(current_farm, *room_counter, room_number);
 			//printf("after switching edges to duplicate\n");
 			//print_farm_debug(current_farm);
@@ -407,7 +412,7 @@ void add_zero_edge(t_room **farm, int from, int to, int weight)
 	new_edge->weight = weight;
 	new_list = (t_list*)malloc(sizeof(t_list));
 	new_list->content = new_edge;
-	new_list->content_size = sizeof(new_edge);
+	new_list->content_size = sizeof(*new_edge);
 	new_list->next = NULL;
 	ft_lstadd(&farm[from]->out_edges, new_list);
 	ft_lstadd(&farm[to]->in_edges, ft_lst_deep_copy(new_list, (void *(*)(
@@ -453,41 +458,52 @@ t_list *find_shortest_paths(t_room **farm, int *room_counter, int ants,
 	best_path_list = NULL;
 	while (i < max_path_count && i < ants)
 	{
+		printf("459. size: %zu\n", farm[1058]->in_edges->content_size);
 		ft_farm_copy(farm, current_farm);
 		if (i != 0)
 		{
+			printf("459. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			reverse_shortest_paths(current_farm, shortest_path_list);
-			////printf("find_shortest_paths - after reverse_shortest_paths\n");
+			//printf("find_shortest_paths - after reverse_shortest_paths\n");
 			////print_farm_debug(current_farm);
+			printf("463. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			duplicate_rooms(current_farm, shortest_path_list, room_counter);
-			////printf("after duplicate room===============\n");
+			//printf("after duplicate room===============\n");
 			//print_farm_debug(current_farm);
+			printf("467. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			bellman_ford_algo(current_farm, *room_counter);
 			if (!check_for_connected_graph(current_farm, *room_counter))
 				break ;
+			printf("471. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			shortest_path = get_shortest_path_before_collapse(current_farm,
 															  *room_counter);
 			//printf("shortest path before collapse\n");
 			//print_edges_debug(shortest_path);
+			printf("476. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			shortest_path = collapse_shortest_path(current_farm, shortest_path);
 			//printf("shortest path after collapse\n");
 			//print_edges_debug(shortest_path);
+			printf("480. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			delete_bilateral_edges(shortest_path, &shortest_path_list);
 			//printf("shortest path after delete bilateral edges\n");
 			//print_edges_debug(shortest_path_list);
 		}
 		else
 		{
+			printf("487. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			bellman_ford_algo(current_farm, *room_counter);
 			if (!check_for_connected_graph(current_farm, *room_counter))
 				return (NULL);													// Check for NULL in calling function (unconnected graph!!!)
+			printf("491. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			shortest_path = get_shortest_path_before_collapse(current_farm,
 															  *room_counter);
 			//printf("find_shortest_paths - after first get_shortest_path_before_collapse\n");
 			//print_farm_debug(current_farm);
+			printf("496. size: %zu\n", current_farm[1058]->in_edges->content_size);
 			shortest_path_list = ft_lst_deep_copy(shortest_path,
 												  (void *(*)(void *)) edge_copy);
 		}
+		printf("500. size: %zu\n", current_farm[1058]->in_edges->content_size);
 		current_effectiveness = get_effectiveness_of_shortest_path_list(
 				shortest_path_list, ants, i + 1, farm); // i + 1 - count of paths
 		if (current_effectiveness <= *effectiveness)
@@ -760,13 +776,14 @@ t_list	*get_shortest_path_before_collapse(t_room **farm, int room_counter)
 			break ;
 		i++;
 	}
-	fill_shortest_path(farm, i, &shortest_path);
+	fill_shortest_path(farm, i, &shortest_path, 0);
 	//printf("====================inside get_shortest_path_before_collapse==========================\n");
 	//print_edges_debug(shortest_path);
 	return (shortest_path);
 }
 
-void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path)
+void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path,
+						int counter)
 {
 	t_list* min_dist_room_edge;
 	t_list *edges;
@@ -788,11 +805,11 @@ void fill_shortest_path(t_room **farm, int room_number, t_list **shortest_path)
 		}
 		edges = edges->next;
 	}
-	edge_to_path = ft_lst_deep_copy(min_dist_room_edge,
+	edge_to_path = ft_node_copy(min_dist_room_edge,
 									(void *(*)(void *)) edge_copy);
 	ft_lstadd(shortest_path, edge_to_path);
 	if (farm[min_dist_room_number]->type != START)
-		fill_shortest_path(farm, min_dist_room_number, shortest_path);
+		fill_shortest_path(farm, min_dist_room_number, shortest_path, counter);
 }
 
 void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and destroy one of parallel out_edges
@@ -806,12 +823,12 @@ void reverse_shortest_paths(t_room **current_farm, t_list *shortest_path) // and
 		to = ((t_edge *) shortest_path->content)->to;
 		//printf("reverse_shortest_paths - before seek_and_negate\n");
 		//print_farm_debug(current_farm);
-		seek_and_negate_edge(&current_farm[to]->out_edges, from, to); // find edge with direction from TO to FROM and set weight to -1
-		seek_and_negate_edge(&current_farm[from]->in_edges, from, to); // find edge with direction from TO to FROM and set weight to -1
+		seek_and_negate_edge(&(current_farm[to]->out_edges), from, to); // find edge with direction from TO to FROM and set weight to -1
+		seek_and_negate_edge(&(current_farm[from]->in_edges), from, to); // find edge with direction from TO to FROM and set weight to -1
 		//printf("reverse_shortest_paths - after seek_and_negate\n");
 		//print_farm_debug(current_farm);
-		seek_and_destroy_edge(&current_farm[from]->out_edges, from, to); // find edge with direction from FROM to TO and DESTROY
-		seek_and_destroy_edge(&current_farm[to]->in_edges, from, to); // find edge with direction from FROM to TO and DESTROY in in_edges
+		seek_and_destroy_edge(&(current_farm[from]->out_edges), from, to); // find edge with direction from FROM to TO and DESTROY
+		seek_and_destroy_edge(&(current_farm[to]->in_edges), from, to); // find edge with direction from FROM to TO and DESTROY in in_edges
 		//printf("reverse_shortest_paths - after seek_and_destroy\n");
 		//print_farm_debug(current_farm);
 		shortest_path = shortest_path->next;
@@ -859,10 +876,13 @@ void seek_and_negate_edge(t_list **edge_list, int from, int to) {
 }
 
 void initialize_current_farm(t_room **current_farm) {
-	while (*current_farm)
+	int i;
+
+	i = 0;
+	while (i < 10000)
 	{
-		*current_farm = (t_room*)malloc(sizeof(t_room));
-		current_farm++;
+		current_farm[i] = (t_room*)malloc(sizeof(t_room));
+		i++;
 	}
 }
 
@@ -875,19 +895,21 @@ void free_current_farm(t_room **current_farm) {
 }
 
 void ft_farm_copy(t_room **farm, t_room **current_farm) {
-	while (*farm)
+	int i;
+	
+	i = 0;
+	while (farm[i] != NULL)
 	{
-		*current_farm = (t_room*)malloc(sizeof(t_room));
-		(*current_farm)->name = (*farm)->name;
-		(*current_farm)->coordinates[0] = (*farm)->coordinates[0];
-		(*current_farm)->coordinates[1] = (*farm)->coordinates[1];
-		(*current_farm)->type = (*farm)->type;
-		(*current_farm)->out_edges = (*farm)->out_edges;
-		(*current_farm)->in_edges = (*farm)->in_edges;
-		(*current_farm)->way = (*farm)->way;
-		(*current_farm)->dist = (*farm)->dist;
-		current_farm++;
-		farm++;
+		current_farm[i] = (t_room*)malloc(sizeof(t_room));
+		current_farm[i]->name = farm[i]->name;
+		current_farm[i]->coordinates[0] = farm[i]->coordinates[0];
+		current_farm[i]->coordinates[1] = farm[i]->coordinates[1];
+		current_farm[i]->type = farm[i]->type;
+		current_farm[i]->out_edges = farm[i]->out_edges;
+		current_farm[i]->in_edges = farm[i]->in_edges;
+		current_farm[i]->way = farm[i]->way;
+		current_farm[i]->dist = farm[i]->dist;
+		i++;
 	}
 }
 
@@ -947,7 +969,7 @@ int main()
 	room_counter = read_instructions(farm, &ants);
 
 	//printf("main\n");
-	print_farm_debug(farm);
+	//print_farm_debug(farm);
 
 	shortest_path_list = find_shortest_paths(farm, &room_counter, ants, &effectiveness);
 
